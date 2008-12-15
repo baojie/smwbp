@@ -8,6 +8,7 @@ $wgExtensionFunctions[] = 'wfSetupVariables';
  
 $wgExtensionCredits['parserhook'][] = array(
         'name' => 'Variables',
+        'version' => '1.1',
         'url' => 'http://www.mediawiki.org/wiki/Extension:VariablesExtension',
         'author' => 'Rob Adams',
         'description' => 'Define page-scoped variables'
@@ -23,9 +24,13 @@ class ExtVariables {
         return '';
     }
  
+    function vardefineecho( &$parser, $expr = '', $value = '' ) {
+        $this->mVariables[$expr] = $value;
+        return $value ;
+    }
+ 
     function varf( &$parser, $expr = '' ) {
-	    if (isset($this->mVariables) && array_key_exists($expr,$this->mVariables)) return $this->mVariables[$expr];
-	    return '';
+        return $this->mVariables[$expr];
     }
 }
  
@@ -35,14 +40,13 @@ function wfSetupVariables() {
     $wgExtVariables = new ExtVariables;
  
     $wgParser->setFunctionHook( 'vardefine', array( &$wgExtVariables, 'vardefine' ) );
+    $wgParser->setFunctionHook( 'vardefineecho', array( &$wgExtVariables, 'vardefineecho' ) );
     $wgParser->setFunctionHook( 'var', array( &$wgExtVariables, 'varf' ) );
 }
  
-function wfVariablesLanguageGetMagic( &$magicWords, $langCode ) {
+function wfVariablesLanguageGetMagic( &$magicWords, $langCode = 0 ) {
         require_once( dirname( __FILE__ ) . '/Variables.i18n.php' );
         foreach( efVariablesWords( $langCode ) as $word => $trans )
                 $magicWords[$word] = $trans;
         return true;
 }
- 
-?>
