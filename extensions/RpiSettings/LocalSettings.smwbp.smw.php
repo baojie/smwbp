@@ -24,8 +24,8 @@ include_once('extensions/SemanticMediaWiki/includes/SMW_Settings.php');
 enableSemantics('example.org');
 
 
-# export triples which have class as object
-$smwgOWLFullExport = TRUE;
+# SMW options
+$smwgOWLFullExport = TRUE;   # export triples which have class as object
 $smwgShowFactbox = SMW_FACTBOX_NONEMPTY;   # show factbox
 $smwgAllowRecursiveExport=true;
 
