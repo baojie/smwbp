@@ -1,0 +1,57 @@
+/* captcha stuff */
+
+#captcha fieldset .captcha_challenge {
+    margin-top: 6px;
+}
+
+#captcha fieldset legend {
+    color: black;
+}
+
+#captcha fieldset .captcha_refresh {
+    font-size: 9px;
+}
+
+#captcha fieldset .recaptcha_text {
+    font-size: 9px;
+}
+
+#captcha fieldset .captcha_optout {
+    font-size: 9px;
+}
+
+#captcha fieldset .captcha_challenge img {
+    border: 0px solid;
+}
+
+#captcha fieldset .captcha_input input {
+    margin-top: 4px;
+    width: 132px;
+}
+
+#captcha fieldset .captcha_input label {
+    margin-right: 4px;
+}
+
+.register #captcha fieldset .captcha_input label {
+    font-weight: bold;
+}
+
+.captcha_solved_message {
+    width: 280px;
+    margin-top: 0px;
+}
+
+.audiocaptcha {
+  overflow: hidden;
+  display: block;
+  margin: 0; padding: 0;
+  height: 0;
+}
+
+.audiocaptcha a {
+ display: block;
+  text-indent: -5000px;
+}
+
+
