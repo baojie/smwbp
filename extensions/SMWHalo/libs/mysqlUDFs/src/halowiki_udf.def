@@ -1,7 +1,0 @@
-LIBRARY		HALOWIKI
-VERSION		1.0
-EXPORTS
-  editdistance_init
-  editdistance
-  editdistance_dl_init
-  editdistance_dl
