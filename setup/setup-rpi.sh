@@ -34,23 +34,13 @@ fi
 ###################################################
 # Switch to extension directory
 ###################################################
-cd $WIKI_DIR
+cd $WIKI_DIR/extensions
 
 
 ###################################################
 # MW Extensions
 ###################################################
 
-# LdapAuth (http://www.mediawiki.org/wiki/Extension:LDAP_Authentication)
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/extensions/LdapAuth/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update LdapAuth
-fi
 
 ###################################################
 # SMW Extensions

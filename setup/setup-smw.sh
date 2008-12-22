@@ -51,7 +51,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update SemanticMediaWiki/
+  svn update SemanticMediaWiki
 fi
 
 
@@ -66,7 +66,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update Variables/
+  svn update Variables
 fi
 
 # StringFunctions (http://www.mediawiki.org/wiki/Extension:StringFunctions)
@@ -77,7 +77,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update StringFunctions/
+  svn update StringFunctions
 fi
 
 # ParserFunctions (http://www.mediawiki.org/wiki/Extension:ParserFunctions)
@@ -88,7 +88,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update ParserFunctions/
+  svn update ParserFunctions
 fi
 
 # CategoryTree (http://www.mediawiki.org/wiki/Extension:CategoryTree)
@@ -99,7 +99,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update CategoryTree/
+  svn update CategoryTree
 fi
 
 
@@ -111,7 +111,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update LdapAuth/
+  svn update LdapAuth
 fi
 
 ###################################################
@@ -125,7 +125,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update SemanticForms/
+  svn update SemanticForms
 fi
 
 # Semantic Result Format (only compatible with SMW 1.4)
@@ -136,7 +136,7 @@ fi
 
 if [ $1 = "update" ]
 then
-  svn update SemanticResultFormats/
+  svn update SemanticResultFormats
 fi
 
 
@@ -145,10 +145,10 @@ fi
 ###################################################
 if [ $1 = "install" ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/RpiSettings/
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
 fi
 
 if [ $1 = "update" ]
 then
-  svn update RpiSettings/
+  svn update SMWBP
 fi
