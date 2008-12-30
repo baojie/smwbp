@@ -19,6 +19,9 @@ $wgGroupPermissions['*']['edit'] = false;  # restrict anonymous edit
 # svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticMediaWiki/
 ## #######################################
 
+# MW 1.14 did set this value to 20M, but that is not enough
+ini_set( 'memory_limit', '60M' );
+
 # include SMW
 include_once('extensions/SemanticMediaWiki/includes/SMW_Settings.php');
 #enableSemantics('example.org');
