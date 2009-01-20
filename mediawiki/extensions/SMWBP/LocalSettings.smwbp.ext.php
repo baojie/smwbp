@@ -43,6 +43,14 @@ $wgUseAjax = true;
 require_once( 'extensions/CategoryTree/CategoryTree.php' );
 $wgCategoryTreeMaxDepth = array(CT_MODE_PAGES => 5, CT_MODE_ALL => 5, CT_MODE_CATEGORIES => 10) ;
 
+## --- Icon --- 
+# display url with icon
+# http://www.mediawiki.org/wiki/Extension:Icon
+# svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Icon/
+
+require_once( "$IP/extensions/Icon/Icon.php" );
+
+
 
 
 ## #######################################

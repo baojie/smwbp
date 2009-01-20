@@ -114,6 +114,31 @@ then
   svn update LdapAuth
 fi
 
+
+
+# Icon (http://www.mediawiki.org/wiki/Extension:Icon)
+if [ $1 = "install" ]
+then
+  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Icon/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update Icon
+fi
+
+
+# MWSearch (http://www.mediawiki.org/wiki/Extension:MWSearch)
+if [ $1 = "install" ]
+then
+  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/MWSearch/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update MWSearch
+fi
+
 ###################################################
 # Install SMW Extensions
 ###################################################
