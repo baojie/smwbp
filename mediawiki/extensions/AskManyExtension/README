@@ -1,0 +1,43 @@
+AskMany extension v0.01
+Created by Evan Patton, with input by Li Ding and Jie Bao
+Tetherless World Constellation, Rensselaer Polytechnic Institute
+
+-------------------------------------------------------------------------------
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-------------------------------------------------------------------------------
+
+Place the AskManyExtension folder into the extensions/ directory of your wiki
+installation. To enable the extension with default settings, you must enter two
+lines into your LocalSettings.php file:
+
+    include_once('extensions/AskManyExtension/includes/SMW_AM_Main.php');
+    enableAskMany();
+
+There are two flags which can be set to control the functionality of the 
+AskMany extension at this point in time: $amgAskManyResponder and 
+$amgAskManyRequestor.
+
+$amgAskManyResponder is initially set to true and allows for the wiki to 
+respond to external queries for semantic information. Setting this flag to 
+false will prevent your wiki from responding to queries from other wikis.
+
+$amgAskManyRequestor is initially set to true and allows for the processing of 
+the <askmany> tag to be parsed locally on this wiki. Setting the flag to false 
+will prevent the processing of any AskMany queries in wikitext.
+
+The extension is still under development and there are a number of new features
+that will be added soon. If you have any ideas or bugs that you would like 
+addressed, please contact the author at pattoe@rpi.edu
