@@ -11,5 +11,10 @@
 # disallow anonymous edit
 $wgGroupPermissions['*']['edit'] = false;  # restrict anonymous edit
 
+# add user privillege
+$wgGroupPermissions['user']['delete'] = true;  # allow user delete
+$wgGroupPermissions['user']['move'] = true;  # allow user move
+$wgGroupPermissions['user']['refresh'] = true;  # allow user refresh
+
 
 ?>
