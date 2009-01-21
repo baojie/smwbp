@@ -28,7 +28,7 @@ fi
 ###################################################
 # call the other install
 ###################################################
-./setup-smw.sh "$1" "$2"
+./setup-smwplus.sh "$1" "$2"
 
 
 ###################################################
@@ -46,17 +46,6 @@ cd $WIKI_DIR/extensions
 # SMW Extensions
 ###################################################
 
-# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
-if [ $1 = "install" ]
-then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticDrilldown
-fi
-
 
 # TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
 if [ $1 = "install" ]
@@ -69,3 +58,29 @@ then
   svn update TetherlessMap
 fi
 
+
+
+
+# MWSearch (http://www.mediawiki.org/wiki/Extension:MWSearch)
+if [ $1 = "install" ]
+then
+  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/MWSearch/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update MWSearch
+fi
+
+
+# Widgets (http://www.mediawiki.org/wiki/Extension:Widgets) 
+# for embedding video and etc.
+if [ $1 = "install" ]
+then
+  svn checkout http://mediawiki-widgets.googlecode.com/svn/trunk/Widgets
+fi
+
+if [ $1 = "update" ]
+then
+  svn update Widgets
+fi
