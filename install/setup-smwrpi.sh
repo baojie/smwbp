@@ -83,14 +83,14 @@ then
 fi
 
 
-# Widgets (http://www.mediawiki.org/wiki/Extension:Widgets) 
-# for embedding video and etc.
+# EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo) 
+# for embedding video 
 if [ $1 = "install" ]
 then
-  svn checkout http://mediawiki-widgets.googlecode.com/svn/trunk/ Widgets
+   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
 fi
 
 if [ $1 = "update" ]
 then
-  svn update Widgets
+  svn update EmbedVideo
 fi

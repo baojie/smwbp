@@ -16,6 +16,13 @@
 require_once("$IP/extensions/Widgets/Widgets.php");
 
 
+## --- EmbedVideo --- 
+# embed youtube
+# http://www.mediawiki.org/wiki/Extension:EmbedVideo
+#  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
+
+require_once('extensions/EmbedVideo/EmbedVideo.php');
+
 
 ## #######################################
 ## SMW Extensions
