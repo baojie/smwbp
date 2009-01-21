@@ -8,14 +8,6 @@
 ## MW Extensions
 ## #######################################
 
-## --- Widgets --- 
-# Allows adding free-type widgets to the wiki by editing pages in Widget namespace
-# http://www.mediawiki.org/wiki/Extension:Widgets
-# svn checkout http://mediawiki-widgets.googlecode.com/svn/trunk/ Widgets
-
-require_once("$IP/extensions/Widgets/Widgets.php");
-
-
 ## --- EmbedVideo --- 
 # embed youtube
 # http://www.mediawiki.org/wiki/Extension:EmbedVideo
