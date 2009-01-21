@@ -13,7 +13,7 @@ $wgUseAjax = true; //MUST
 include_once('extensions/SMWHalo/includes/SMW_Initialize.php');
 #enableSMWHalo();
 
-$phpInterpreter = "/usr/local/bin/php";
+$phpInterpreter = "/usr/bin/php";
 
 #enableSMWHalo('SMWHaloStore2','SMWTripleStore');
 #$smwgMessageBroker = "localhost";
