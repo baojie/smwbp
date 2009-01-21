@@ -87,7 +87,7 @@ fi
 # for embedding video and etc.
 if [ $1 = "install" ]
 then
-  svn checkout http://mediawiki-widgets.googlecode.com/svn/trunk/Widgets
+  svn checkout http://mediawiki-widgets.googlecode.com/svn/trunk/ Widgets
 fi
 
 if [ $1 = "update" ]
