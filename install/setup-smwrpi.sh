@@ -59,6 +59,16 @@ then
 fi
 
 
+# AskMany (http://tw.rpi.edu/wiki/Help:AskMany)
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskMany/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update AskMany
+fi
 
 
 # MWSearch (http://www.mediawiki.org/wiki/Extension:MWSearch)
