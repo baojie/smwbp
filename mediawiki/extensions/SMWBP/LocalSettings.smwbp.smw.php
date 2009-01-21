@@ -24,14 +24,16 @@ ini_set( 'memory_limit', '60M' );
 
 # include SMW
 include_once('extensions/SemanticMediaWiki/includes/SMW_Settings.php');
-enableSemantics('example.org');
+#enableSemantics('example.org');
 
 
-# SMW options
+
+# SMW configurations
+# see also http://semantic-mediawiki.org/wiki/Help:Configuration
 $smwgOWLFullExport = TRUE;   # export triples which have class as object
 $smwgShowFactbox = SMW_FACTBOX_NONEMPTY;   # show factbox
-$smwgAllowRecursiveExport=true;
-
+$smwgAllowRecursiveExport=true;  # for better RDF dump
+$smwgToolboxBrowseLink=false;  # it is already included in the navigation penal of side bar
 
 
 ?>
