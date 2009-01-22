@@ -24,11 +24,15 @@ else
 fi
 
 
+###################################################
+# Install Mediawiki (MW, 1.13)
+###################################################
+./setup-mw.sh "$1" "$2"
 
 ###################################################
-# call the other install
+# Install SMW extensions
 ###################################################
-./setup-smw.sh "$1" "$2"
+./inc-ext-smw.sh "$1" "$2"
 
 
 ###################################################
@@ -56,6 +60,21 @@ fi
 cd extensions
 
 ###################################################
-# Install SMW extensions
+# Install SMW 1.4.1
 ###################################################
+
+if [ $1 = "install" ]
+then
+  wget http://downloads.sourceforge.net/semediawiki/semediawiki-1.4.1.tar.gz
+  tar -zxf semediawiki-1.4.1.tar.gz
+  rm semediawiki-1.4.1.tar.gz
+fi
+
+
+if [ $1 = "install" ]
+then
+  wget http://downloads.sourceforge.net/semediawiki/SemanticResultFormats.tar.gz
+  tar -zxf SemanticResultFormats.tar.gz
+  rm SemanticResultFormats.tar.gz
+fi
 

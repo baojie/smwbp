@@ -36,6 +36,8 @@ then
   svn update $WIKI_DIR
 fi
 
+
+
 ###################################################
 # Switch to extension directory
 ###################################################
@@ -126,8 +128,26 @@ then
   svn update Icon
 fi
 
-############################
-## less important enhancements
+
+###################################################
+# Install SMWBP Configuration Settings
+###################################################
+echo "SMWBP"
+
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update SMWBP
+fi
+
+
+###################################################
+## experimental install
+###################################################
 
 
 # EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo)  for embedding video 
@@ -154,20 +174,4 @@ fi
 if [ $1 = "update" ]
 then
   svn update wx
-fi
-
-
-###################################################
-# Install MW and SMW Configuration Settings
-###################################################
-echo "SMWBP"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SMWBP
 fi

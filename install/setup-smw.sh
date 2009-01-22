@@ -29,15 +29,21 @@ fi
 
 
 ###################################################
+# Install SMW extensions
+###################################################
+./inc-ext-smw.sh "$1" "$2"
+
+
+###################################################
 # Switch to extension directory
 ###################################################
 cd $WIKI_DIR/extensions
 
 
 ###################################################
-# Install Semantic MediaWiki (SMW, 1.4)
+# Install Semantic MediaWiki (SMW)
 ###################################################
-echo "Semantic MediaWiki 1.4.1"
+echo "Semantic MediaWiki"
 
 if [ $1 = "install" ]
 then
@@ -47,23 +53,6 @@ fi
 if [ $1 = "update" ]
 then
   svn update SemanticMediaWiki
-fi
-
-
-###################################################
-# Install SMW Extensions
-###################################################
-# Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
-echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticForms/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticForms
 fi
 
 # Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
@@ -77,63 +66,4 @@ fi
 if [ $1 = "update" ]
 then
   svn update SemanticResultFormats
-fi
-
-###################################################
-# Experimental install
-
-# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
-echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticDrilldown
-fi
-
-
-# AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
-echo "AskMany"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskManyExtension/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update AskManyExtension
-fi
-
-# TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
-echo "TetherlessMap"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/TetherlessMap/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update TetherlessMap
-fi
-
-
-###################################################
-# Install MW and SMW Configuration Settings
-###################################################
-echo "SMWBP"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SMWBP
 fi
