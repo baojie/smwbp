@@ -51,7 +51,18 @@ $wgCategoryTreeMaxDepth = array(CT_MODE_PAGES => 5, CT_MODE_ALL => 5, CT_MODE_CA
 require_once( "$IP/extensions/Icon/Icon.php" );
 
 
+## ---WikiWidgets ---
+# Provides lots of new variables to use in wiki text.
+# http://www.mediawiki.org/wiki/Extension:WikiWidgets
+# http://hexten.net/wiki/index.php/Installed_Widgets
+# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/wx/
+include_once('extensions/wx/widget.php');
 
+## --- EmbedVideo ---
+# Provides lots of new variables to use in wiki text.
+# http://www.mediawiki.org/wiki/Extension:EmbedVideo
+# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
+include_once('extensions/EmbedVideo/EmbedVideo.php');
 
 ## #######################################
 ## SMW Extensions

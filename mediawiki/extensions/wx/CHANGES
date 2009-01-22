@@ -1,0 +1,11 @@
+Changes:
+
+0.1     2007-04-13
+        Initial release. Many bugs I'm sure.
+
+0.2     2007-05-03
+        Tidied up error handling for unloadable Widgets.
+        Added xargs attr as a place to hide args with non-XML compliant names.
+        
+0.3	????-??-??
+	Fixed error reporting for XML parser errors.

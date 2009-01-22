@@ -18,7 +18,7 @@ function enableAskMany() {
 	#$wgHooks['LanguageGetMagic'][] = 'amfAddMagicWords';
 
 	$wgAutoloadClasses['AMAskExternal']	= $amgIP . '/specials/SMW_SpecialAskExternal.php';
-	$wgSpecialPages['AskExternal']		= 'AMAskExternal';
+	$wgSpecialPages['AskExternal']		= array('AMAskExternal');
 }
 
 function amfSetupExtension() {
