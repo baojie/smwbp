@@ -25,5 +25,7 @@ $smwgShowFactbox = SMW_FACTBOX_NONEMPTY;   # show factbox
 $smwgAllowRecursiveExport=true;  # for better RDF dump
 $smwgToolboxBrowseLink=false;  # it is already included in the navigation penal of side bar
 
+# enables a status bar in  SMW Admin page (Data repair and upgrade section )
+$phpInterpreter = "/usr/bin/php";
 
 ?>
