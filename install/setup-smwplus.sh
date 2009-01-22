@@ -57,13 +57,3 @@ cd extensions
 # Install SMW extensions
 ###################################################
 
-# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
-if [ $1 = "install" ]
-then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticDrilldown
-fi

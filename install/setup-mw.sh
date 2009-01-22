@@ -113,6 +113,34 @@ then
   svn update Icon
 fi
 
+############################
+## less important enhancements
+
+
+# EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo) 
+# for embedding video 
+if [ $1 = "install" ]
+then
+   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update EmbedVideo
+fi
+
+# WikiWidgets (http://www.mediawiki.org/wiki/Extension:WikiWidgets) 
+# for embedding some widgets 
+if [ $1 = "install" ]
+then
+   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/wx/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update wx
+fi
+
 
 ###################################################
 # Install MW and SMW Configuration Settings

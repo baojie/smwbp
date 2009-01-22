@@ -73,6 +73,43 @@ then
   svn update SemanticResultFormats
 fi
 
+###################################################
+# Experimental install
+
+# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
+if [ $1 = "install" ]
+then
+  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update SemanticDrilldown
+fi
+
+
+# AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskManyExtension/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update AskManyExtension
+fi
+
+# TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/TetherlessMap/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update TetherlessMap
+fi
+
 
 ###################################################
 # Install MW and SMW Configuration Settings

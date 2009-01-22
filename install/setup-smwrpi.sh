@@ -47,29 +47,6 @@ cd $WIKI_DIR/extensions
 ###################################################
 
 
-# TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/TetherlessMap/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update TetherlessMap
-fi
-
-
-# AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
-if [ $1 = "install" ]
-then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskManyExtension/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update AskManyExtension
-fi
-
 
 # MWSearch (http://www.mediawiki.org/wiki/Extension:MWSearch)
 if [ $1 = "install" ]
@@ -83,14 +60,4 @@ then
 fi
 
 
-# EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo) 
-# for embedding video 
-if [ $1 = "install" ]
-then
-   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
-fi
 
-if [ $1 = "update" ]
-then
-  svn update EmbedVideo
-fi
