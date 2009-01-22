@@ -25,6 +25,7 @@ fi
 ###################################################
 # Install Mediawiki (MW, 1.13)
 ###################################################
+echo "Mediawiki 1.13.3"
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_13/phase3  $WIKI_DIR
@@ -45,6 +46,8 @@ cd $WIKI_DIR/extensions
 # Install MW Extensions
 ###################################################
 # VariablesExtension (http://www.mediawiki.org/wiki/Extension:Variables)
+echo "http://www.mediawiki.org/wiki/Extension:Variables"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/Variables/
@@ -56,6 +59,8 @@ then
 fi
 
 # StringFunctions (http://www.mediawiki.org/wiki/Extension:StringFunctions)
+echo "http://www.mediawiki.org/wiki/Extension:StringFunctions"
+
 if [ $1 = "install" ]
 then 
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/StringFunctions/
@@ -67,6 +72,8 @@ then
 fi
 
 # ParserFunctions (http://www.mediawiki.org/wiki/Extension:ParserFunctions)
+echo "http://www.mediawiki.org/wiki/Extension:ParserFunctions"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/ParserFunctions/
@@ -78,6 +85,8 @@ then
 fi
 
 # CategoryTree (http://www.mediawiki.org/wiki/Extension:CategoryTree)
+echo "http://www.mediawiki.org/wiki/Extension:CategoryTree"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/CategoryTree/
@@ -89,7 +98,9 @@ then
 fi
 
 
-# LdapAuth (http://www.mediawiki.org/wiki/LdapAuth)
+# LdapAuth (LdapAuth)
+echo "LdapAuth"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/LdapAuth/
@@ -103,6 +114,8 @@ fi
 
 
 # Icon (http://www.mediawiki.org/wiki/Extension:Icon)
+echo "http://www.mediawiki.org/wiki/Extension:Icon"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Icon/
@@ -117,8 +130,9 @@ fi
 ## less important enhancements
 
 
-# EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo) 
-# for embedding video 
+# EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo)  for embedding video 
+echo "http://www.mediawiki.org/wiki/Extension:EmbedVideo"
+
 if [ $1 = "install" ]
 then
    svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
@@ -129,8 +143,9 @@ then
   svn update EmbedVideo
 fi
 
-# WikiWidgets (http://www.mediawiki.org/wiki/Extension:WikiWidgets) 
-# for embedding some widgets 
+# WikiWidgets (http://www.mediawiki.org/wiki/Extension:WikiWidgets)  for embedding some widgets 
+echo "http://www.mediawiki.org/wiki/Extension:WikiWidgets"
+
 if [ $1 = "install" ]
 then
    svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/wx/
@@ -145,6 +160,8 @@ fi
 ###################################################
 # Install MW and SMW Configuration Settings
 ###################################################
+echo "SMWBP"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/

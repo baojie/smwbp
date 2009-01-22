@@ -40,6 +40,8 @@ cd $WIKI_DIR
 ###################################################
 # Install SMW Plus (1.4)
 ###################################################
+echo "SMW+ 1.4"
+
 if [ $1 = "install" ]
 then
   wget http://downloads.sourceforge.net/halo-extension/smwplus-1.4.zip

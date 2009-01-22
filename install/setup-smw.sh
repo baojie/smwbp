@@ -37,6 +37,8 @@ cd $WIKI_DIR/extensions
 ###################################################
 # Install Semantic MediaWiki (SMW, 1.4)
 ###################################################
+echo "Semantic MediaWiki 1.4.1"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticMediaWiki/
@@ -51,7 +53,9 @@ fi
 ###################################################
 # Install SMW Extensions
 ###################################################
-# Semantic Forms 
+# Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticForms/
@@ -62,7 +66,9 @@ then
   svn update SemanticForms
 fi
 
-# Semantic Result Format (only compatible with SMW 1.4)
+# Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticResultFormats/
@@ -77,6 +83,8 @@ fi
 # Experimental install
 
 # Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
+
 if [ $1 = "install" ]
 then
   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
@@ -89,6 +97,8 @@ fi
 
 
 # AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
+echo "AskMany"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskManyExtension/
@@ -100,6 +110,8 @@ then
 fi
 
 # TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
+echo "TetherlessMap"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/TetherlessMap/
@@ -114,6 +126,8 @@ fi
 ###################################################
 # Install MW and SMW Configuration Settings
 ###################################################
+echo "SMWBP"
+
 if [ $1 = "install" ]
 then
   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
