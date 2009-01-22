@@ -18,7 +18,7 @@ function enableAskMany() {
 	#$wgHooks['LanguageGetMagic'][] = 'amfAddMagicWords';
 
 	$wgAutoloadClasses['AMAskExternal']	= $amgIP . '/specials/SMW_SpecialAskExternal.php';
-	$wgSpecialPages['AskExternal']		= array('AMAskExternal');
+	$wgSpecialPages['AskExternal']		= 'AMAskExternal';
 }
 
 function amfSetupExtension() {
@@ -38,8 +38,8 @@ function amfSetupExtension() {
         }
 
 	$wgExtensionCredits['parserhook'][] = 
-            array('name'=>'AskMany&nbsp;Extension',
-	          'version'=>AM_VERSION,
+            array('name'=>'AskManyExtension',
+	          'version'=>'0.1',
                   'author'=>'[http://www.evanpatton.com/ Evan Patton], [http://tw.rpi.edu/ Tetherless World]',
 		  'url'=>'http://tw.rpi.edu/wiki/index.php/AskMany_Extension',
 		  'description'=>'Adds the ability to query other wikis with the AskMany extension installed.');
