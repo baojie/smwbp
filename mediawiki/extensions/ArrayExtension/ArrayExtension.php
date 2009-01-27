@@ -1,8 +1,11 @@
 <?php
 /*
-
  Defines a subset of parser functions that operate with arrays.
-
+ verion: 1.0
+ authors: Li Ding (lidingpku@gmail.com) and Jie Bao
+ update: 27 Janunary 2009
+ 
+ 
  == Part1. constructor ==
  {{#arraydefine:key|values|delimiter}}
 

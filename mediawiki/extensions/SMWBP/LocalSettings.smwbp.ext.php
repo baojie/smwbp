@@ -50,6 +50,13 @@ $wgCategoryTreeMaxDepth = array(CT_MODE_PAGES => 5, CT_MODE_ALL => 5, CT_MODE_CA
 
 require_once( "$IP/extensions/Icon/Icon.php" );
 
+## --- ArrayExtension ---
+# Provides array variables in wiki
+# http://www.mediawiki.org/wiki/Extension:ArrayExtension
+# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/ArrayExtension/
+
+include_once('extensions/ArrayExtension/ArrayExtension.php');
+
 
 ## ---WikiWidgets ---
 # Provides lots of new variables to use in wiki text.
