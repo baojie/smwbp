@@ -4,6 +4,7 @@
  verion: 1.0
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
  update: 27 Janunary 2009
+ homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  
  == Part1. constructor ==
