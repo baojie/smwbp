@@ -129,6 +129,19 @@ then
 fi
 
 
+# ArrayExtension (http://www.mediawiki.org/wiki/Extension:ArrayExtension)
+echo "http://www.mediawiki.org/wiki/Extension:ArrayExtension"
+
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/ArrayExtension/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update ArrayExtension
+fi
+
 ###################################################
 # Install SMWBP Configuration Settings
 ###################################################
