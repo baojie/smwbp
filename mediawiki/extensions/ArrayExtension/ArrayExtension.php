@@ -1,7 +1,7 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.0
+ verion: 1.0.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
  update: 27 Janunary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
@@ -165,17 +165,21 @@ class ArrayExtension {
     // define an array variable
     function arraydefine( &$parser, $key = '', $value = '' , $delimiter = ',', $option = 'list', $sort = 'none') {
         //normalize 
+	$value = trim($value);
+	$delimiter = trim($delimiter);
 	$value = preg_replace('/\s*'.$delimiter.'\s*/', $delimiter, $value);
-	if ($this->mArrayExtension[$key] = explode ($delimiter, $value)){
-	      switch ($option){	
+	if (empty ($value)){
+	    $this->mArrayExtension[$key] = array();
+	}else if (empty ($delimiter)){
+	    $this->mArrayExtension[$key] = array( $value );
+	}else{ 
+	    $this->mArrayExtension[$key] = explode ($delimiter, $value);
+	    switch ($option){	
 		case 'unique': $this->arrayunique($parser, $key); break;
-	      };
-	      $this->arraysort($parser, $key, $sort);
-	    
-	}else{
-	      $this->mArrayExtension[$key] = array( $value );
+	    };
+	    $this->arraysort($parser, $key, $sort);
 	}
-	
+	    	
 	return '';  
     }
 
