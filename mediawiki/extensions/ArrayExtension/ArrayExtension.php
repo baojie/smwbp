@@ -50,7 +50,7 @@
    
    {{#arraymember:key|value}}
 
-   check if value is a member of the array identified by key, returns "yes", "no"
+   check if value is a member of the array identified by key, returns "1", "0"
    See: http://www.php.net/manual/en/function.in-array.php
    
    
@@ -290,10 +290,10 @@ class ArrayExtension {
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
 	    if ($ret = in_array ($needle, $this->mArrayExtension[$key]))
-	       return 'yes';
+	       return '1';
 	       
         }
-	return 'no';
+	return '0';
     }    
 
     
