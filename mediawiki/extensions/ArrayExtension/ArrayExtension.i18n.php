@@ -15,9 +15,11 @@ function efArrayExtensionWords( $lang ) {
         $words['en'] = array(
                 'arraydefine'    => array( 0, 'arraydefine' ),
 
-                'arraysize'         => array( 0,'arraysize' ),
                 'arrayprint'          => array( 0, 'arrayprint' ),
 
+                'arraysize'         => array( 0,'arraysize' ),
+                'arrayindex'         => array( 0,'arrayindex' ),
+		
                 'arrayunique'         => array( 0,'arrayunique' ),
                 'arraysort'         => array( 0,'arraysort' ),
                 'arraymerge'         => array( 0,'arraymerge' ),

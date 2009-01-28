@@ -1,10 +1,16 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.0.1
+ verion: 1.0.2
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 27 Janunary 2009
+ update: 28 Janunary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
+ 
+ changelog
+ * Jan 28, 2009 version 1.0.2 
+    - changed arraypop  (add one parameter)
+    - added arrayindex (return an array element at index)
+ * Jan 27, 2009  version 1.0.1 changed arraydefine (allow defining empty array)
  
  
  == Part1. constructor ==
@@ -37,10 +43,6 @@
   {{#arrayprint:b|<br/>|\{\{#set:a=|\}\} }}   -- make templates
  {{#arrayprint:b|<br/>|\[\[name::|]]}}   -- make SMW links
  
- 
- 
-
- == Part3. basic array functions ==
    {{#arraysize:key}}
 
    Print the size (number of elements) in the specified array
@@ -50,10 +52,16 @@
    
    {{#arraymember:key|value}}
 
-   check if value is a member of the array identified by key, returns "1", "0"
+   print "1" or "0" to show whether the value is a member of the array identified by key
    See: http://www.php.net/manual/en/function.in-array.php
    
-   
+ 
+   {{#arrayindex:key|index}}
+
+   print the value of an array (identified by key)  by the index, invalid index result in nothing being printed. note the index is 0-based.
+ 
+
+ == Part3. basic array functions ==
    
    
    {{#arraymerge:key|key1|key2}}
@@ -78,7 +86,16 @@
    make the array identified by key a set (all elements are unique)
    see: http://www.php.net/manual/en/function.array-unique.php
    
-   
+    {{#arraypush:key|values|delimiter}}
+
+    push a set of values to the array identified by key
+    see: http://www.php.net/manual/en/function.array-push.php
+    
+    {{#arraypop:key|number}}
+
+    pop the some (described by 'number')  members from the end of the array identified by key
+    see: http://www.php.net/manual/en/function.array-pop.php
+       
    
     == Part 4.  set operations ==
     
@@ -100,18 +117,8 @@
     
     set operation,    {white} = {red, white}  -  {red}
     see: http://www.php.net/manual/en/function.array-diff.php
-    
-    == Part 5.  stack operations ==
-    {{#arraypush:key|values|delimiter}}
+   
 
-    push a set of values to the array identified by key
-    see: http://www.php.net/manual/en/function.array-push.php
-    
-    {{#arraypop:key}}
-
-    pop the last meber of the array identified by key
-    see: http://www.php.net/manual/en/function.array-pop.php
-    
     
     
 The  MIT License
@@ -228,11 +235,18 @@ class ArrayExtension {
        }
     }
    
+    function arrayindex( &$parser, $key = '', $index ) {
 
+	if (isset($this->mArrayExtension)
+	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])
+        ){
+		if (is_numeric($index) && $index>=0 && $index<count($this->mArrayExtension[$key])){
+		    return $this->mArrayExtension[$key][$index];
+		}
+       }
+       return '';
+    }
    
-    //////////////////////////////////////////////////
-    // ARRAY OPERATIONS:   
-    
     // return size of array
     function arraysize( &$parser, $key = '') {
        if (isset($this->mArrayExtension)    
@@ -242,6 +256,21 @@ class ArrayExtension {
 	}
        return '';
     }    
+    
+    // membership test, check if a value is member of a set
+    function arraymember( &$parser, $key = '', $needle = '') {
+        if (isset($this->mArrayExtension) &&  !empty($needle)    
+	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
+	{
+	    if ($ret = in_array ($needle, $this->mArrayExtension[$key]))
+	       return '1';
+	       
+        }
+	return '0';
+    }        
+   
+    //////////////////////////////////////////////////
+    // ARRAY OPERATIONS:   
 
     // convert an array to set
     function arrayunique( &$parser, $key = '') {
@@ -288,17 +317,7 @@ class ArrayExtension {
         }
 	return '';
     }    
-    // membership test, check if a value is member of a set
-    function arraymember( &$parser, $key = '', $needle = '') {
-        if (isset($this->mArrayExtension) &&  !empty($needle)    
-	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
-	{
-	    if ($ret = in_array ($needle, $this->mArrayExtension[$key]))
-	       return '1';
-	       
-        }
-	return '0';
-    }    
+
 
     
     
@@ -320,11 +339,20 @@ class ArrayExtension {
     }    
     
     // remove an element from the end of an array
-    function arraypop( &$parser, $key = '' ) {
+    function arraypop( &$parser, $key = '' , $number='1') {
         if (isset($this->mArrayExtension)    
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    array_pop ($this->mArrayExtension[$key]);
+		if (is_numeric($number)){
+			if ($number >= count($this->mArrayExtension[$key])){
+				$this->mArrayExtension[$key] = array();
+			}else{
+				while ($number>0){
+				    array_pop ($this->mArrayExtension[$key]);
+				    $number--;
+				}
+			}
+		}
         }
 	return '';
     }    
@@ -379,14 +407,14 @@ function wfSetupArrayExtension() {
  
     $wgParser->setFunctionHook( 'arraydefine', array( &$wgArrayExtension, 'arraydefine' ) );
 
-    $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
     $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
+    $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
+    $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
     $wgParser->setFunctionHook( 'arraymember', array( &$wgArrayExtension, 'arraymember' ) );
 
-    $wgParser->setFunctionHook( 'arrayunique', array( &$wgArrayExtension, 'arrayunique' ) );
-    $wgParser->setFunctionHook( 'arraysort', array( &$wgArrayExtension, 'arraysort' ) );
     $wgParser->setFunctionHook( 'arraymerge', array( &$wgArrayExtension, 'arraymerge' ) );
-
+    $wgParser->setFunctionHook( 'arraysort', array( &$wgArrayExtension, 'arraysort' ) );
+    $wgParser->setFunctionHook( 'arrayunique', array( &$wgArrayExtension, 'arrayunique' ) );
     $wgParser->setFunctionHook( 'arraypush', array( &$wgArrayExtension, 'arraypush' ) );
     $wgParser->setFunctionHook( 'arraypop', array( &$wgArrayExtension, 'arraypop' ) );
 
