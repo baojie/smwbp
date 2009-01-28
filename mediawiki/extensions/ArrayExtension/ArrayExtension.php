@@ -61,14 +61,7 @@
    print the value of an array (identified by key)  by the index, invalid index result in nothing being printed. note the index is 0-based.
  
 
- == Part3. basic array functions ==
-   
-   
-   {{#arraymerge:key|key1|key2}}
-   
-   merge values two arrayes identified by key1 and key2 into a new array identified by key.
-   this merge differs from array_merge of php because it merges values.
-   
+ == Part3. alter array ==
    
    
    {{#arraysort:key|order}}
@@ -97,7 +90,15 @@
     see: http://www.php.net/manual/en/function.array-pop.php
        
    
-    == Part 4.  set operations ==
+   == Part4. create a new array ==
+   
+   {{#arraymerge:key|key1|key2}}
+   
+   merge values two arrayes identified by key1 and key2 into a new array identified by key.
+   this merge differs from array_merge of php because it merges values.
+   
+   
+    == Part 5.  create a new array, set operations ==
     
     {{#arrayintersect:key|key1|key2}}
     
@@ -159,6 +160,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
+        'version' => '1.0.2',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
@@ -270,7 +272,7 @@ class ArrayExtension {
     }        
    
     //////////////////////////////////////////////////
-    // ARRAY OPERATIONS:   
+    // alter an array   
 
     // convert an array to set
     function arrayunique( &$parser, $key = '') {
@@ -298,27 +300,6 @@ class ArrayExtension {
 	return '';
     }    
     
-    
-    // merge two arrays,  keep duplicated values 
-    function arraymerge( &$parser, $key = '', $key1 = '', $key2 = '') {
-        if (isset($this->mArrayExtension)    
-	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
-	){
-	    $this->mArrayExtension[$key] = array();
-	    foreach ($this->mArrayExtension[$key1] as $entry){
-		   array_push ($this->mArrayExtension[$key], $entry);
-	    }
-
-	    if ( array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2])){
-		foreach ($this->mArrayExtension[$key2] as $entry){
-		   array_push ($this->mArrayExtension[$key], $entry);
-		}
-	    }
-        }
-	return '';
-    }    
-
-
     
     
     // append element(s)  to the end of an array
@@ -353,6 +334,28 @@ class ArrayExtension {
 				}
 			}
 		}
+        }
+	return '';
+    }    
+
+    //////////////////////////////////////////////////
+    // create  an array   
+    
+    // merge two arrays,  keep duplicated values 
+    function arraymerge( &$parser, $key = '', $key1 = '', $key2 = '') {
+        if (isset($this->mArrayExtension)    
+	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
+	){
+	    $this->mArrayExtension[$key] = array();
+	    foreach ($this->mArrayExtension[$key1] as $entry){
+		   array_push ($this->mArrayExtension[$key], $entry);
+	    }
+
+	    if ( array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2])){
+		foreach ($this->mArrayExtension[$key2] as $entry){
+		   array_push ($this->mArrayExtension[$key], $entry);
+		}
+	    }
         }
 	return '';
     }    
@@ -412,11 +415,12 @@ function wfSetupArrayExtension() {
     $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
     $wgParser->setFunctionHook( 'arraymember', array( &$wgArrayExtension, 'arraymember' ) );
 
-    $wgParser->setFunctionHook( 'arraymerge', array( &$wgArrayExtension, 'arraymerge' ) );
     $wgParser->setFunctionHook( 'arraysort', array( &$wgArrayExtension, 'arraysort' ) );
     $wgParser->setFunctionHook( 'arrayunique', array( &$wgArrayExtension, 'arrayunique' ) );
     $wgParser->setFunctionHook( 'arraypush', array( &$wgArrayExtension, 'arraypush' ) );
     $wgParser->setFunctionHook( 'arraypop', array( &$wgArrayExtension, 'arraypop' ) );
+
+    $wgParser->setFunctionHook( 'arraymerge', array( &$wgArrayExtension, 'arraymerge' ) );
 
     $wgParser->setFunctionHook( 'arrayunion', array( &$wgArrayExtension, 'arrayunion' ) );
     $wgParser->setFunctionHook( 'arrayintersect', array( &$wgArrayExtension, 'arrayintersect' ) );

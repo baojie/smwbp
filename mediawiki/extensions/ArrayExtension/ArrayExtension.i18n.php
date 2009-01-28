@@ -16,21 +16,20 @@ function efArrayExtensionWords( $lang ) {
                 'arraydefine'    => array( 0, 'arraydefine' ),
 
                 'arrayprint'          => array( 0, 'arrayprint' ),
-
                 'arraysize'         => array( 0,'arraysize' ),
                 'arrayindex'         => array( 0,'arrayindex' ),
+                'arraymember'         => array( 0,'arraymember' ),	
 		
                 'arrayunique'         => array( 0,'arrayunique' ),
                 'arraysort'         => array( 0,'arraysort' ),
+                'arraypush'         => array( 0,'arraypush' ),
+                'arraypop'         => array( 0,'arraypop' ),
+
                 'arraymerge'         => array( 0,'arraymerge' ),
-                'arraymember'         => array( 0,'arraymember' ),	
 
                 'arrayunion'         => array( 0,'arrayunion' ),
                 'arrayintersect'         => array( 0,'arrayintersect' ),
                 'arraydiff'         => array( 0,'arraydiff' ),	
-
-                'arraypush'         => array( 0,'arraypush' ),
-                'arraypop'         => array( 0,'arraypop' ),
         );
  
         # English is used as a fallback, and the English synonyms are
