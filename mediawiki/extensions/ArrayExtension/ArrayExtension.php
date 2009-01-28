@@ -8,7 +8,7 @@
  
  changelog
  * Jan 28, 2009 version 1.0.2 
-    - changed arraypop  (add one parameter)
+    - changed arraypop  (add one parameter to support multiple pop)
     - added arrayindex (return an array element at index)
  * Jan 27, 2009  version 1.0.1 changed arraydefine (allow defining empty array)
  
