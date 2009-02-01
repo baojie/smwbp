@@ -1,16 +1,19 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.0.2
+ verion: 1.0.3
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 28 Janunary 2009
+ update: 01 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 1, 2009 version 1.0.3 
+    - fixed bug on arrayunique,   php array_unique only make values unique, but the array index was not updated.  (arraydefine is also affected)
  * Jan 28, 2009 version 1.0.2 
     - changed arraypop  (add one parameter to support multiple pop)
     - added arrayindex (return an array element at index)
- * Jan 27, 2009  version 1.0.1 changed arraydefine (allow defining empty array)
+ * Jan 27, 2009  version 1.0.1 
+    - changed arraydefine (allow defining empty array)
  
  
  == Part1. constructor ==
@@ -279,7 +282,11 @@ class ArrayExtension {
         if (isset($this->mArrayExtension)   
               && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-     	    $this->mArrayExtension[$key] = array_unique ($this->mArrayExtension[$key]);
+	    $temp = array_unique ($this->mArrayExtension[$key]);
+	    $this->mArrayExtension[$key] = array();
+	    foreach ($temp as $value){
+		array_push ($this->mArrayExtension[$key], $value);
+	    }
         }
 	return '';
     }    
