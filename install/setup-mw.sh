@@ -142,6 +142,19 @@ then
   svn update ArrayExtension
 fi
 
+# LoopFunctions (http://www.mediawiki.org/wiki/Extension:LoopFunctions)
+echo "http://www.mediawiki.org/wiki/Extension:LoopFunctions"
+
+if [ $1 = "install" ]
+then
+  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/LoopFunctions/
+fi
+
+if [ $1 = "update" ]
+then
+  svn update LoopFunctions
+fi
+
 ###################################################
 # Install SMWBP Configuration Settings
 ###################################################
