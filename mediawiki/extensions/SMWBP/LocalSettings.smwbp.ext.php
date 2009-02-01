@@ -55,7 +55,7 @@ if (file_exists($extension)){
 # http://www.mediawiki.org/wiki/Extension:Icon
 # svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Icon/
 
-$extension='$IP/extensions/Icon/Icon.php';
+$extension='extensions/Icon/Icon.php';
 if (file_exists($extension))
    require_once($extension);
 
