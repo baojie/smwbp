@@ -73,7 +73,7 @@ if (file_exists($extension))
 # http://www.mediawiki.org/wiki/Extension:Loops
 # svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/Loops/
 
-$extension='extensions/LoopFunctions/Loops.php';
+$extension='extensions/Loops/Loops.php';
 if (file_exists($extension))
    require_once($extension);
 
