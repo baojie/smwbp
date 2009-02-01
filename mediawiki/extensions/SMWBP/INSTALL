@@ -16,7 +16,7 @@ to install SMW with halo extension
 
 4. install a wiki
 we use demo  as the name of wiki
- ./setup-smw.sh install demo
+ ./setup-smw.sh demo
 
 5. configure wiki from web interface
  
@@ -54,4 +54,4 @@ Part 2: Hints
    ini_set( 'memory_limit', '20M' );
 
 3. to install SMW with HALO extension, use different configuration and setup file
-   setup-halo-smwplus.sh
+   setup-halo-smwplus.sh   myhalo
