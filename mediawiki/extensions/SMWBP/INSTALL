@@ -9,7 +9,7 @@ to install SMW only
  wget http://smwbp.googlecode.com/svn/trunk/setup/setup-smw.sh
 
 to install SMW with halo extension
- wget http://smwbp.googlecode.com/svn/trunk/setup/setup-smwplus.sh
+ wget http://smwbp.googlecode.com/svn/trunk/setup/setup-halo-smwplus.sh
 
 3. make the setup file executable
   chmod +x setup-smw.sh
@@ -30,6 +30,8 @@ finally
 Edit LocalSettings.php by adding lines at the end
 
 ##################################
+require_once( "extensions/SMWBP/LocalSettings.smwbp.mw.php" );
+
 require_once( "extensions/SMWBP/LocalSettings.smwbp.smw.php" );
 
 # (Optional) recommended SMW extensions
@@ -52,5 +54,4 @@ Part 2: Hints
    ini_set( 'memory_limit', '20M' );
 
 3. to install SMW with HALO extension, use different configuration and setup file
-   setup-smwplus.sh
-   LocalSettings.smwbp.smwplus.php
+   setup-halo-smwplus.sh

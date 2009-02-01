@@ -17,8 +17,10 @@
 # a page for drilling down into the category-based and semantic data of a site, using easily-created filters.
 # http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown
 # svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
+$extension='extensions/SemanticDrilldown/includes/SD_Settings.php';
+if (file_exists($extension))
+   require_once($extension);
 
-require_once( 'extensions/SemanticDrilldown/includes/SD_Settings.php' );
 
 ## --- TetherlessMap--- 
 # adding map with SMW
@@ -29,9 +31,13 @@ require_once( 'extensions/SemanticDrilldown/includes/SD_Settings.php' );
 #$wgGoogleMapsKey = "......"; # enter your Google Maps API key here
 #$wgLocalPath= "......";  #enter your host server address
 
-require_once ("$IP/extensions/TetherlessMap/Individual_Location.php");
-require_once ("$IP/extensions/TetherlessMap/GoogleMapClick.php");
-require_once ("$IP/extensions/TetherlessMap/GoogleMapMultiObjects.php");
+$extension='extensions/TetherlessMap/Individual_Location.php';
+if (file_exists($extension)){
+   require_once ("$IP/extensions/TetherlessMap/Individual_Location.php");
+   require_once ("$IP/extensions/TetherlessMap/GoogleMapClick.php");
+   require_once ("$IP/extensions/TetherlessMap/GoogleMapMultiObjects.php");
+}
+
 
 
 
@@ -40,7 +46,11 @@ require_once ("$IP/extensions/TetherlessMap/GoogleMapMultiObjects.php");
 # http://tw.rpi.edu/wiki/Help:AskMany
 #   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskMany/
 
-require_once('extensions/AskManyExtension/includes/SMW_AM_Main.php');
-enableAskMany();
+$extension='extensions/AskManyExtension/includes/SMW_AM_Main.php';
+if (file_exists($extension)){
+   require_once($extension);
+   enableAskMany();
+}
+
 
 ?>
