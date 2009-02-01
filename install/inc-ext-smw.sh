@@ -5,22 +5,13 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "setup-smw install WIKI_DIR - install smw at the subdirectory named WIKI_DIR"
-   echo "setup-smw update WIKI_DIR - update smw at the subdirectory named WIKI_DIR"
-   echo "by default, WIKI_DIR is mw13"
+   echo "setup-mw WIKI_DIR - install/update mw and swm extensions at the sub-directory named WIKI_DIR"
    exit
+else
+   # configure your installation path
+   WIKI_DIR=$1
 fi
 
-###################################################
-# configuration
-###################################################
-# configure your installation path
-if [ -z "$2" ]
-then 
-   WIKI_DIR=mw13
-else
-   WIKI_DIR=$2
-fi
 
 
 
@@ -37,16 +28,15 @@ cd $WIKI_DIR/extensions
 # Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticForms"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticForms/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticForms
-fi
-
 
 
 ###################################################
@@ -55,39 +45,42 @@ fi
 # Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticDrilldown"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update SemanticDrilldown
-fi
 
 
 # AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
 echo "AskMany"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="AskManyExtension"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/AskManyExtension/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update AskManyExtension
-fi
+
 
 # TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
 echo "TetherlessMap"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="TetherlessMap"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/TetherlessMap/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update TetherlessMap
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi

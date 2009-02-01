@@ -5,33 +5,23 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "setup-smw install WIKI_DIR - install smw at the subdirectory named WIKI_DIR"
-   echo "setup-smw update WIKI_DIR - update smw at the subdirectory named WIKI_DIR"
-   echo "by default, WIKI_DIR is mw13"
+   echo "setup-smw WIKI_DIR - install/update semantic mediawiki at the sub-directory named WIKI_DIR"
    exit
-fi
-
-###################################################
-# configuration
-###################################################
-# configure your installation path
-if [ -z "$2" ]
-then 
-   WIKI_DIR=mw13
 else
-   WIKI_DIR=$2
+   # configure your installation path
+   WIKI_DIR=$1
 fi
 
 ###################################################
 # Install Mediawiki (MW, 1.13)
 ###################################################
-./setup-mw.sh "$1" "$2"
+./setup-mw.sh "$1"
 
 
 ###################################################
 # Install SMW extensions
 ###################################################
-./inc-ext-smw.sh "$1" "$2"
+./inc-ext-smw.sh "$1"
 
 
 ###################################################
@@ -45,25 +35,25 @@ cd $WIKI_DIR/extensions
 ###################################################
 echo "Semantic MediaWiki"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticMediaWiki"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticMediaWiki/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticMediaWiki
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 # Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticResultFormats"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticResultFormats/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update SemanticResultFormats
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi

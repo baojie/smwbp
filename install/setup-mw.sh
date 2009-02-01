@@ -5,35 +5,23 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "setup-mw install WIKI_DIR - install mw at the subdirectory named WIKI_DIR"
-   echo "setup-mw update WIKI_DIR - update mw at the subdirectory named WIKI_DIR"
-   echo "by default, WIKI_DIR is mw13"
+   echo "setup-mw WIKI_DIR - install/update mediawiki at the sub-directory named WIKI_DIR"
    exit
-fi
-
-###################################################
-# configuration
-###################################################
-# configure your installation path
-if [ -z "$2" ]
-then 
-   WIKI_DIR=mw13
 else
-   WIKI_DIR=$2
+   # configure your installation path
+   WIKI_DIR=$1
 fi
 
 ###################################################
 # Install Mediawiki (MW, 1.13)
 ###################################################
 echo "Mediawiki 1.13.3"
-if [ $1 = "install" ]
+if [ -d $WIKI_DIR ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_13/phase3  $WIKI_DIR
-fi
-
-if [ $1 = "update" ]
-then
+  echo "updating...";
   svn update $WIKI_DIR
+else
+  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_13/phase3  $WIKI_DIR
 fi
 
 
@@ -50,109 +38,111 @@ cd $WIKI_DIR/extensions
 # VariablesExtension (http://www.mediawiki.org/wiki/Extension:Variables)
 echo "http://www.mediawiki.org/wiki/Extension:Variables"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="Variables"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/Variables/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update Variables
-fi
 
 # StringFunctions (http://www.mediawiki.org/wiki/Extension:StringFunctions)
 echo "http://www.mediawiki.org/wiki/Extension:StringFunctions"
 
-if [ $1 = "install" ]
-then 
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/StringFunctions/
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="StringFunctions"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update StringFunctions
-fi
 
 # ParserFunctions (http://www.mediawiki.org/wiki/Extension:ParserFunctions)
 echo "http://www.mediawiki.org/wiki/Extension:ParserFunctions"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="ParserFunctions"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/ParserFunctions/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update ParserFunctions
-fi
 
 # CategoryTree (http://www.mediawiki.org/wiki/Extension:CategoryTree)
 echo "http://www.mediawiki.org/wiki/Extension:CategoryTree"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="CategoryTree"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/CategoryTree/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
+
+# Icon (http://www.mediawiki.org/wiki/Extension:Icon)
+echo "http://www.mediawiki.org/wiki/Extension:Icon"
+
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="Icon"
+if [ -d $EXT_NAME ]
 then
-  svn update CategoryTree
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 
 # LdapAuth (LdapAuth)
 echo "LdapAuth"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="LdapAuth"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/LdapAuth/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update LdapAuth
-fi
-
-
-
-# Icon (http://www.mediawiki.org/wiki/Extension:Icon)
-echo "http://www.mediawiki.org/wiki/Extension:Icon"
-
-if [ $1 = "install" ]
-then
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Icon/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update Icon
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 
 # ArrayExtension (http://www.mediawiki.org/wiki/Extension:ArrayExtension)
 echo "http://www.mediawiki.org/wiki/Extension:ArrayExtension"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="ArrayExtension"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/ArrayExtension/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update ArrayExtension
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 # LoopFunctions (http://www.mediawiki.org/wiki/Extension:LoopFunctions)
 echo "http://www.mediawiki.org/wiki/Extension:LoopFunctions"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="LoopFunctions"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/LoopFunctions/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update LoopFunctions
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 ###################################################
@@ -160,15 +150,16 @@ fi
 ###################################################
 echo "SMWBP"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="SMWBP"
+if [ -d $EXT_NAME ]
 then
-  svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SMWBP/
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-if [ $1 = "update" ]
-then
-  svn update SMWBP
-fi
 
 
 ###################################################
@@ -179,25 +170,25 @@ fi
 # EmbedVideo (http://www.mediawiki.org/wiki/Extension:EmbedVideo)  for embedding video 
 echo "http://www.mediawiki.org/wiki/Extension:EmbedVideo"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="EmbedVideo"
+if [ -d $EXT_NAME ]
 then
-   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update EmbedVideo
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 # WikiWidgets (http://www.mediawiki.org/wiki/Extension:WikiWidgets)  for embedding some widgets 
 echo "http://www.mediawiki.org/wiki/Extension:WikiWidgets"
 
-if [ $1 = "install" ]
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="wx"
+if [ -d $EXT_NAME ]
 then
-   svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/wx/
-fi
-
-if [ $1 = "update" ]
-then
-  svn update wx
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
