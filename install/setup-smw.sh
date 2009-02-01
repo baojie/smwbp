@@ -5,7 +5,7 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "setup-smw WIKI_DIR - install/update semantic mediawiki at the sub-directory named WIKI_DIR"
+   echo "./setup-smw.sh WIKI_DIR - install/update semantic mediawiki at the sub-directory named WIKI_DIR"
    exit
 else
    # configure your installation path

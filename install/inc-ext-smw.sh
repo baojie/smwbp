@@ -4,8 +4,7 @@
 ###################################################
 if [ -z "$1" ]
 then 
-   echo "Example Usage"
-   echo "setup-mw WIKI_DIR - install/update mw and swm extensions at the sub-directory named WIKI_DIR"
+   echo "This script should not be called directly, please use setup scripts"
    exit
 else
    # configure your installation path
