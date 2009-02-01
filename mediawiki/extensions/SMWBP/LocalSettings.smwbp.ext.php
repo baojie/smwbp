@@ -70,10 +70,10 @@ if (file_exists($extension))
 
 ## --- LoopFunctions ---
 # Provides loop function
-# http://www.mediawiki.org/wiki/Extension:LoopFunctions
-# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/LoopFunctions/
+# http://www.mediawiki.org/wiki/Extension:Loops
+# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/Loops/
 
-$extension='extensions/LoopFunctions/LoopFunctions.php';
+$extension='extensions/LoopFunctions/Loops.php';
 if (file_exists($extension))
    require_once($extension);
 

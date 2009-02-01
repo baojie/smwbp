@@ -132,11 +132,11 @@ else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-# LoopFunctions (http://www.mediawiki.org/wiki/Extension:LoopFunctions)
-echo "http://www.mediawiki.org/wiki/Extension:LoopFunctions"
+# Loops (http://www.mediawiki.org/wiki/Extension:Loops)
+echo "http://www.mediawiki.org/wiki/Extension:Loops"
 
 EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
-EXT_NAME="LoopFunctions"
+EXT_NAME="Loops"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";
