@@ -78,22 +78,7 @@ if (file_exists($extension))
    require_once($extension);
 
    
-## ---WikiWidgets ---
-# Provides lots of new variables to use in wiki text.
-# http://www.mediawiki.org/wiki/Extension:WikiWidgets
-# http://hexten.net/wiki/index.php/Installed_Widgets
-# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/wx/
-$extension='extensions/wx/widget.php';
-if (file_exists($extension))
-   require_once($extension);
 
-## --- EmbedVideo ---
-# Provides lots of new variables to use in wiki text.
-# http://www.mediawiki.org/wiki/Extension:EmbedVideo
-# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/EmbedVideo/
-$extension='extensions/EmbedVideo/EmbedVideo.php';
-if (file_exists($extension))
-   require_once($extension);
 
 ## #######################################
 ## SMW Extensions

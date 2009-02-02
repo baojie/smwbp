@@ -7,6 +7,8 @@
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 2, 2009 version 1.0.4
+    - add "random" option to #arraysort, make the array of values in random order
  * Feb 1, 2009 version 1.0.3 
     - fixed bug on arrayunique,   php array_unique only make values unique, but the array index was not updated.  (arraydefine is also affected)
  * Jan 28, 2009 version 1.0.2 
@@ -73,9 +75,10 @@
     * none (default)  - no sort   
    *  desc - in descending order, large to small
    *  asce - in ascending order, small to large
+   * random - shuffle the arrry in random order
    see: http://www.php.net/manual/en/function.sort.php
           http://www.php.net/manual/en/function.rsort.php
-   
+          http://www.php.net/manual/en/function.shuffle.php
    
    {{#arrayunique:key}}
 
@@ -282,11 +285,7 @@ class ArrayExtension {
         if (isset($this->mArrayExtension)   
               && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    $temp = array_unique ($this->mArrayExtension[$key]);
-	    $this->mArrayExtension[$key] = array();
-	    foreach ($temp as $value){
-		array_push ($this->mArrayExtension[$key], $value);
-	    }
+	    $this->mArrayExtension[$key] = array_values(array_unique ($this->mArrayExtension[$key]));
         }
 	return '';
     }    
@@ -302,6 +301,7 @@ class ArrayExtension {
 		
 		case 'desc': rsort($this->mArrayExtension[$key]); break;
 		case 'descending': rsort($this->mArrayExtension[$key]); break;
+		case 'random': shuffle($this->mArrayExtension[$key]); break;
 	    };
         }
 	return '';

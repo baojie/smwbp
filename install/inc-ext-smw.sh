@@ -83,3 +83,17 @@ then
 else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
+
+
+# Ratings (http://www.mediawiki.org/wiki/Extension:Ratings)
+echo "Ratings"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="Ratings"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
