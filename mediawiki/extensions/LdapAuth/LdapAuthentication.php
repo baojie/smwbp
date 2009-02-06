@@ -877,7 +877,7 @@ class LdapAuthenticationPlugin extends AuthPlugin {
 			$this->printDebug( "Setting domain as default: $wgLDAPDefaultDomain", NONSENSITIVE );
 			$_SESSION['wsDomain'] = $wgLDAPDefaultDomain;
 		}else{
-			$this->printDebug( "Setting domain as: $domai																				n", NONSENSITIVE );
+			$this->printDebug( "Setting domain as: $domain", NONSENSITIVE );
 			$_SESSION['wsDomain'] = $domain;
 		}
 	}
