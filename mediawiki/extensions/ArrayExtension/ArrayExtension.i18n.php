@@ -18,14 +18,14 @@ function efArrayExtensionWords( $lang ) {
                 'arrayprint'          => array( 0, 'arrayprint' ),
                 'arraysize'         => array( 0,'arraysize' ),
                 'arrayindex'         => array( 0,'arrayindex' ),
-                'arraymember'         => array( 0,'arraymember' ),	
+                'arraysearch'         => array( 0,'arraysearch' ),	
 		
                 'arrayunique'         => array( 0,'arrayunique' ),
                 'arraysort'         => array( 0,'arraysort' ),
-                'arraypush'         => array( 0,'arraypush' ),
-                'arraypop'         => array( 0,'arraypop' ),
+                'arrayreset'         => array( 0,'arrayreset' ),
 
                 'arraymerge'         => array( 0,'arraymerge' ),
+                'arrayslice'         => array( 0,'arrayslice' ),
 
                 'arrayunion'         => array( 0,'arrayunion' ),
                 'arrayintersect'         => array( 0,'arrayintersect' ),

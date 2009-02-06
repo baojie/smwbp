@@ -1,14 +1,27 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.0.3
+ verion: 1.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 01 Feburary 2009
+ update: 05 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
- * Feb 2, 2009 version 1.0.4
-    - add "random" option to #arraysort, make the array of values in random order
+ * Feb 5, 2009 version 1.1
+    - update #arraydefine: replacing  'explode' by 'preg_split', 
+           and we now allow delimitors to  be (i) a string; or (ii) a perl regular expressnion pattern, sourrounded by '/', e.g. '/..blah.../'
+    - update #arrayprint, change parameters from "prefix","suffix" to a "template", 
+           and users can replace a substring in the template with array value, similar to arraymap in semantic forms
+    - update #arrayunique,  empty elements will be removed
+    - update #arraysort: adding "random" option to make the array of values in random order
+    - add #arrayreset to free all defined arrays for memory saving
+    - add #arrayslice to return an array bounded by start_index and length.
+    - add  #arraysearch. now we can return the index of the first occurence of an element, return -1 if not found
+    - remove #arraymember,  obsoleted by #arraysearch
+    - remove #arraypush, obsoleted by #arraydefine and #arraymerge
+    - remove #arraypop, obsoleted by  #arrayslice    
+    - add safty check code to avoid unset parameters
+    
  * Feb 1, 2009 version 1.0.3 
     - fixed bug on arrayunique,   php array_unique only make values unique, but the array index was not updated.  (arraydefine is also affected)
  * Jan 28, 2009 version 1.0.2 
@@ -21,17 +34,19 @@
  == Part1. constructor ==
  {{#arraydefine:key|values|delimiter}}
 
- Define an array by a list of 'values' deliminated by 'delimiter'
+ Define an array by a list of 'values' deliminated by 'delimiter', 
+ the delimiter should be perl regular expression pattern
+ * http://us2.php.net/manual/en/book.pcre.php
+ * see also: http://us2.php.net/manual/en/function.preg-split.php
  
  
  
  == Part2. print functions ==
 
- {{#arrayprint:key|delimiter|prefix|suffix}}
+ {{#arrayprint:key|delimiter|pattern|template}}
 
  Print the values of an array in the following format:
- 
- prefix <value_1> suffix  delimiter prefix <value_2> suffix ... prefix <value_n> suffix 
+ template<value_1> delimiter   template<value_2>  delimiter ...   delimiter template<value_n>
  
  notes:
   1. the following characters are escaped
@@ -44,9 +59,9 @@
  examples:
  {{#arrayprint:b}}    -- simple
   {{#arrayprint:b|<br/>}}    -- add change line
-  {{#arrayprint:b|<br/>|\[\[|]]}}    -- make links
-  {{#arrayprint:b|<br/>|\{\{#set:a=|\}\} }}   -- make templates
- {{#arrayprint:b|<br/>|\[\[name::|]]}}   -- make SMW links
+  {{#arrayprint:b|<br/>|@@@|\[\[@@@]]}}    -- make links
+  {{#arrayprint:b|<br/>|@@@|\{\{#set:a=@@@\}\} }}   -- make templates
+ {{#arrayprint:b|<br/>|@@@|\[\[name::@@@]]}}   -- make SMW links
  
    {{#arraysize:key}}
 
@@ -55,7 +70,7 @@
    
    
    
-   {{#arraymember:key|value}}
+   {{#arraysearch:key|value}}
 
    print "1" or "0" to show whether the value is a member of the array identified by key
    See: http://www.php.net/manual/en/function.in-array.php
@@ -84,18 +99,12 @@
 
    make the array identified by key a set (all elements are unique)
    see: http://www.php.net/manual/en/function.array-unique.php
-   
-    {{#arraypush:key|values|delimiter}}
+          
 
-    push a set of values to the array identified by key
-    see: http://www.php.net/manual/en/function.array-push.php
-    
-    {{#arraypop:key|number}}
+    {{#arrayreset:}}
 
-    pop the some (described by 'number')  members from the end of the array identified by key
-    see: http://www.php.net/manual/en/function.array-pop.php
+   reset all defined arrayes
        
-   
    == Part4. create a new array ==
    
    {{#arraymerge:key|key1|key2}}
@@ -103,7 +112,11 @@
    merge values two arrayes identified by key1 and key2 into a new array identified by key.
    this merge differs from array_merge of php because it merges values.
    
-   
+     {{#arrayslice:key|key1|offset|length}}
+
+    extract a slice from an  array
+    see: http://www.php.net/manual/en/function.array-slice.php
+  
     == Part 5.  create a new array, set operations ==
     
     {{#arrayintersect:key|key1|key2}}
@@ -126,6 +139,12 @@
     see: http://www.php.net/manual/en/function.array-diff.php
    
 
+ -------------------------------------------
+ the following fuctions are obsoleted
+    #arraypush  (replaced by arraymerge)
+    #arraypop  (replaced by arrayslice)
+    #arraymember (replaced by arraysearch)
+ -------------------------------------------
     
     
 The  MIT License
@@ -178,64 +197,78 @@ class ArrayExtension {
     var $mArrayExtension; 
  
     // define an array variable
-    function arraydefine( &$parser, $key = '', $value = '' , $delimiter = ',', $option = 'list', $sort = 'none') {
+    function arraydefine( &$parser, $key, $value='', $delimiter = '/\s*,\s*/', $option = 'all', $sort = 'none') {
+        if (!isset($key))
+	   return '';
+
         //normalize 
 	$value = trim($value);
 	$delimiter = trim($delimiter);
-	$value = preg_replace('/\s*'.$delimiter.'\s*/', $delimiter, $value);
 	if (empty ($value)){
 	    $this->mArrayExtension[$key] = array();
 	}else if (empty ($delimiter)){
 	    $this->mArrayExtension[$key] = array( $value );
 	}else{ 
-	    $this->mArrayExtension[$key] = explode ($delimiter, $value);
+	    if (0!==strpos($delimiter,'/') || (strlen($delimiter)-1)!==strrpos($delimiter,'/')){
+		$delimiter='/\s*'.$delimiter.'\s*/';
+	    }
+	    
+	    $this->mArrayExtension[$key] = preg_split ($delimiter, $value);
 	    switch ($option){	
 		case 'unique': $this->arrayunique($parser, $key); break;
 	    };
 	    $this->arraysort($parser, $key, $sort);
 	}
 	    	
-	return '';  
+	return '';
     }
 
 
     //////////////////////////////////////////////////
     // Display Options:  print array
     
-    function arrayprint( &$parser, $key = '', $delimiter = ', ', $prefix='', $suffix='') {
+    function arrayprint( &$parser, $key , $delimiter = ', ', $pattern='@@@@', $template='@@@@') {
+        if (!isset($key))
+	   return '';
+
         $option='values';
         if ($key =='')
 	   $option='keys';
+	   
+	//clearn up  BY unescaping stuff
+	//if (!empty($template)){
+	//	$template = str_replace('\\[','[',$template);
+	//	$template = str_replace('\\{','{',$template);
+	//	$template = str_replace('\\}','}',$template);
+	//	//$template = str_replace('\\\\','\\',$template);
+	//}	
 
         switch ($option){
 	case "values":
 		if (isset($this->mArrayExtension)
                     && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])
                 ){
-			//unescape prefix and suffix
-			
-		        if (!empty($prefix)){
-				$prefix = str_replace('\\[','[',$prefix);
-				$prefix = str_replace('\\{','{',$prefix);
-				$prefix = str_replace('\\}','}',$prefix);
-				$prefix = str_replace('\\\\','\\',$prefix);
-			}	
-		        if (!empty($suffix)){
-				$suffix = str_replace('\\[','[',$suffix);
-				$suffix = str_replace('\\{','{',$suffix);
-				$suffix = str_replace('\\}','}',$suffix);
-				$suffix = str_replace('\\\\','\\',$suffix);
-			}	
-			
+			$rendered_values= array();
+			if (!empty($pattern)&& !empty($template)){
+				foreach($this->mArrayExtension[$key] as $v){
+					$rendered_values[] = str_replace($pattern, $v, $template);
+				}
+			}
 			// print the entire key
-		        return "$prefix". implode( "$suffix$delimiter$prefix", $this->mArrayExtension[$key] ) ."$suffix";
+		        return implode( $delimiter, $rendered_values );
 		}else{
 			return "undefined array: $key";
 		}
 		break;
 	case "keys":
 	        if (is_array($this->mArrayExtension)) {
-		        return "$prefix". implode( "$suffix$delimiter$prefix", $this->mArrayExtension ) ."$suffix";
+			if (!empty($pattern)&& !empty($template)){
+				foreach($this->mArrayExtension as $v){
+					$rendered_values[] = str_replace($pattern, $v, $template);
+				}
+			}
+			// print the entire key
+		        return implode( $delimiter, $rendered_values );
 		}else{
 		   return '';
 		}
@@ -243,7 +276,9 @@ class ArrayExtension {
        }
     }
    
-    function arrayindex( &$parser, $key = '', $index ) {
+    function arrayindex( &$parser, $key , $index ) {
+        if (!isset($key) || !isset($index))
+	   return '';
 
 	if (isset($this->mArrayExtension)
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])
@@ -256,7 +291,10 @@ class ArrayExtension {
     }
    
     // return size of array
-    function arraysize( &$parser, $key = '') {
+    function arraysize( &$parser, $key) {
+        if (!isset($key) )
+	   return '';
+
        if (isset($this->mArrayExtension)    
             && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])) 
 	{
@@ -265,33 +303,55 @@ class ArrayExtension {
        return '';
     }    
     
-    // membership test, check if a value is member of a set
-    function arraymember( &$parser, $key = '', $needle = '') {
-        if (isset($this->mArrayExtension) &&  !empty($needle)    
+    // locate the index of the first occurence of an element, return -1 if not found
+    function arraysearch( &$parser, $key, $needle) {
+        if (!isset($key) || !isset($needle) || strlen($needle)===0)
+	   return '';
+
+        if (isset($this->mArrayExtension)    
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    if ($ret = in_array ($needle, $this->mArrayExtension[$key]))
-	       return '1';
-	       
+	    if (false !== ($ret = array_search($needle, $this->mArrayExtension[$key], true)))
+	       return $ret;	       
         }
-	return '0';
+	return '-1';
     }        
    
-    //////////////////////////////////////////////////
-    // alter an array   
 
+   
+   //////////////////////////////////////////////////
+    // alter an array   
+    
+    // reset memory
+    function arrayreset( &$parser) {
+	$this->mArrayExtension = array();
+	return '';
+    }    
+    
     // convert an array to set
-    function arrayunique( &$parser, $key = '') {
+    function arrayunique( &$parser, $key ) {
+        if (!isset($key))
+	   return '';
+
         if (isset($this->mArrayExtension)   
               && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    $this->mArrayExtension[$key] = array_values(array_unique ($this->mArrayExtension[$key]));
+	    $this->mArrayExtension[$key]= array_unique ($this->mArrayExtension[$key]);
+	    $values= array();
+	    foreach ($this->mArrayExtension[$key] as $v){
+		if (!empty($v))
+		   $values[]=$v;
+	    }
+	    $this->mArrayExtension[$key] = $values;
         }
 	return '';
     }    
 
     // sort an array 
-    function arraysort( &$parser, $key = '', $sort = 'none') {
+    function arraysort( &$parser, $key , $sort = 'none') {
+        if (!isset($key))
+	   return '';
+    
         if (isset($this->mArrayExtension)    
 	       && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
@@ -307,58 +367,24 @@ class ArrayExtension {
 	return '';
     }    
     
-    
-    
-    // append element(s)  to the end of an array
-    function arraypush( &$parser, $key = '', $value = '', $delimiter = ',') {
-        if (isset($this->mArrayExtension) ){
-	   if (array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])){
-	        $temp = explode ($delimiter, $value);
-		if (isset($temp) && is_array($temp)){
-		    $this->mArrayExtension[$key] = array_merge($this->mArrayExtension[$key], $temp);
-		}else{
-		    array_push($this->mArrayExtension[$key],$value);
-		}
-	   }else{
-		$this->arraydefine( $parser, $key , $value, $delimiter );
-	   }
-        }
-	return '';
-    }    
-    
-    // remove an element from the end of an array
-    function arraypop( &$parser, $key = '' , $number='1') {
-        if (isset($this->mArrayExtension)    
-	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
-	{
-		if (is_numeric($number)){
-			if ($number >= count($this->mArrayExtension[$key])){
-				$this->mArrayExtension[$key] = array();
-			}else{
-				while ($number>0){
-				    array_pop ($this->mArrayExtension[$key]);
-				    $number--;
-				}
-			}
-		}
-        }
-	return '';
-    }    
 
     //////////////////////////////////////////////////
     // create  an array   
     
     // merge two arrays,  keep duplicated values 
-    function arraymerge( &$parser, $key = '', $key1 = '', $key2 = '') {
+    function arraymerge( &$parser, $key, $key1, $key2='' ) {
+        if (!isset($key) ||!isset($key1) )
+	   return '';
+	   
+	$this->mArrayExtension[$key] = array();
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
 	){
-	    $this->mArrayExtension[$key] = array();
 	    foreach ($this->mArrayExtension[$key1] as $entry){
 		   array_push ($this->mArrayExtension[$key], $entry);
 	    }
 
-	    if ( array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2])){
+	    if ( strlen($key2)>0 && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2])){
 		foreach ($this->mArrayExtension[$key2] as $entry){
 		   array_push ($this->mArrayExtension[$key], $entry);
 		}
@@ -367,12 +393,36 @@ class ArrayExtension {
 	return '';
     }    
 
+    // extract a slice from an array
+    // http://us3.php.net/manual/en/function.array-slice.php
+    function arrayslice( &$parser, $key , $key1 , $offset, $length='') {
+        if (!isset($key) || !isset($key1) || !isset($offset))
+	   return '';
+	   
+        $this->mArrayExtension[$key] = array();
+        if (isset($this->mArrayExtension)    
+	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
+	     && !empty($offset) && is_numeric($offset)
+	){
+		if (!empty($length) && is_numeric($length)){
+			$temp = array_slice($this->mArrayExtension[$key1], $offset, $length);
+		}else{
+			$temp = array_slice($this->mArrayExtension[$key1], $offset);		
+		}
+		if (!empty($temp) && is_array($temp))
+		    $this->mArrayExtension[$key] = array_values($temp);
+        }
+	return '';
+    }    
 
     //////////////////////////////////////////////////
     // SET OPERATIONS:    a set does not have duplicated element
     
     // merge two sets
-    function arrayunion( &$parser, $key = '', $key1 = '', $key2 = '') {
+    function arrayunion( &$parser, $key , $key1 , $key2 ) {
+        if (!isset($key) ||!isset($key1) || !isset($key2))
+	   return '';
+
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1])
 	     && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2]) 
@@ -384,7 +434,10 @@ class ArrayExtension {
     }    
 
     // intersect two sets
-    function arrayintersect( &$parser, $key = '', $key1 = '', $key2 = '') {
+    function arrayintersect( &$parser, $key , $key1 , $key2 ) {
+        if (!isset($key) ||!isset($key1) ||!isset($key2))
+	   return '';
+
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1])
 	     && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2]) 
@@ -395,7 +448,10 @@ class ArrayExtension {
     }    
     
     // diff  two sets, subset test
-    function arraydiff( &$parser, $key = '', $key1 = '', $key2 = '') {
+    function arraydiff( &$parser, $key , $key1 , $key2 ) {
+        if (!isset($key) ||!isset($key1) ||!isset($key2))
+	   return '';
+
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1])
 	     && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2]) 
@@ -420,14 +476,14 @@ function wfSetupArrayExtension() {
     $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
     $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
     $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
-    $wgParser->setFunctionHook( 'arraymember', array( &$wgArrayExtension, 'arraymember' ) );
+    $wgParser->setFunctionHook( 'arraysearch', array( &$wgArrayExtension, 'arraysearch' ) );
 
     $wgParser->setFunctionHook( 'arraysort', array( &$wgArrayExtension, 'arraysort' ) );
     $wgParser->setFunctionHook( 'arrayunique', array( &$wgArrayExtension, 'arrayunique' ) );
-    $wgParser->setFunctionHook( 'arraypush', array( &$wgArrayExtension, 'arraypush' ) );
-    $wgParser->setFunctionHook( 'arraypop', array( &$wgArrayExtension, 'arraypop' ) );
+    $wgParser->setFunctionHook( 'arrayreset', array( &$wgArrayExtension, 'arrayreset' ) );
 
     $wgParser->setFunctionHook( 'arraymerge', array( &$wgArrayExtension, 'arraymerge' ) );
+    $wgParser->setFunctionHook( 'arrayslice', array( &$wgArrayExtension, 'arrayslice' ) );
 
     $wgParser->setFunctionHook( 'arrayunion', array( &$wgArrayExtension, 'arrayunion' ) );
     $wgParser->setFunctionHook( 'arrayintersect', array( &$wgArrayExtension, 'arrayintersect' ) );
