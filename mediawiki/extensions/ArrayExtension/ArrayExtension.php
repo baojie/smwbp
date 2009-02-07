@@ -49,12 +49,7 @@
  template<value_1> delimiter   template<value_2>  delimiter ...   delimiter template<value_n>
  
  notes:
-  1. the following characters are escaped
-  [   => \[
-  {   => \{
-  }   => \}
-  \  => \\
- 2. there should be at least a white space between  escaped  '\}'   and the end of template '}}'
+* the template should not embed any template inside
  
  examples:
  {{#arrayprint:b}}    -- simple
