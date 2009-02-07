@@ -180,7 +180,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.0.2',
+        'version' => '1.1',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
