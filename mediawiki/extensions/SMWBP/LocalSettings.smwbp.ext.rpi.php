@@ -34,7 +34,6 @@ if (file_exists($extension))
 $extension='extensions/Ratings/Ratings.php';
 if (file_exists($extension)){
    require_once($extension);
-   enableAskMany();
 }   
    
 ## #######################################
