@@ -1,9 +1,9 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1.1
+ verion: 1.1.2
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 05 Feburary 2009
+ update: 09 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
@@ -82,7 +82,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.1.1',
+        'version' => '1.1.2',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
