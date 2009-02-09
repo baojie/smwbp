@@ -7,6 +7,8 @@
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 9, 2009 version 1.1.2
+    - update #arraysearch, now support offset and preg regular expression
  * Feb 8, 2009 version 1.1.1
     - update #arrayprint, now wiki links, parser functions and templates properly parsed. This enables foreach loop call.
     - update #arraysearch, now allows customized output upon found/non-found by specifying additional parameters
@@ -221,26 +223,52 @@ class ArrayExtension {
     }    
 
 /**
-* locate the index of the first occurence of an element
+* locate the index of the first occurence of an element starting from the 'offset'
 *   - print "-1" or index to show the index of the first occurence of 'value' in the array identified by key
 *    - if 'yes' and 'no' are set, print value of them when found or not-found
 * usage
-*   {{#arraysearch:key|value|yes|no}}
+*   {{#arraysearch:key|value|offset|yes|no}}
 *
 *   See: http://www.php.net/manual/en/function.array-search.php
+*   note it is extended to support regular expression match and offset
 */   
-    function arraysearch( &$parser, $key, $needle, $yes, $no) {
-        if (!isset($key) || !isset($needle) || strlen($needle)===0)
+    function arraysearch( &$parser, $key, $needle, $offset, $yes, $no) {
+        if (!isset($key) || !isset($needle) || strlen($needle)===0 )
 	   return '';
+        if (isset($offset)){
+		if (!is_numeric($offset) || $offset<0 || $offset>=count($this->mArrayExtension[$key]))
+			return ''; //bad offset
+	}else{
+		$offset=0;
+	}
 
         if (isset($this->mArrayExtension)    
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    if (false !== ($ret = array_search($needle, $this->mArrayExtension[$key], true))){
+	    $bIsPreg= (0===strpos($needle,'/') && (strlen($needle)-1)===strrpos($needle,'/'));
+	    $ret = false;
+	    for ($i=$offset; $i< count($this->mArrayExtension[$key]) ;$i++){
+	        $value = $this->mArrayExtension[$key][$i];
+	        if ($bIsPreg){
+			// check if the needle is preg regular expression (require '/.../')
+			if (preg_match($needle, $value)){
+			   $ret = $i;
+			   break;
+			}   
+		}else{
+			if (strcmp($needle, $value)===0){
+			   $ret = $i;
+			   break;
+			}   
+		}	
+	    }
+	    
+	    if (false !== $ret ){
 	       if (isset($yes))
-	          $ret=$yes;
+		  $ret=$yes;
 	       return $ret;	       
 	    }
+	    
         }
 	$ret = -1;
         if (isset($no))
