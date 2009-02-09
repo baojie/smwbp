@@ -1,12 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1
+ verion: 1.1.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
  update: 05 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 8, 2009 version 1.1.1
+    - update #arrayprint, now wiki links, parser functions and templates properly parsed. This enables foreach loop call.
  * Feb 5, 2009 version 1.1
     - update #arraydefine: replacing  'explode' by 'preg_split', 
            and we now allow delimitors to  be (i) a string; or (ii) a perl regular expressnion pattern, sourrounded by '/', e.g. '/..blah.../'
@@ -43,20 +45,20 @@
  
  == Part2. print functions ==
 
- {{#arrayprint:key|delimiter|pattern|template}}
+ {{#arrayprint:key|delimiter|search|subject}}
 
- Print the values of an array in the following format:
- template<value_1> delimiter   template<value_2>  delimiter ...   delimiter template<value_n>
- 
+ foreach value of the array, print 'subject' where  all occurrences of 'search' is replaced with the value, deliminated by 'delimiter'
+  
  notes:
-* the template should not embed any template inside
+* the subject can embed parser functions; wiki links; and templates.
  
  examples:
  {{#arrayprint:b}}    -- simple
   {{#arrayprint:b|<br/>}}    -- add change line
-  {{#arrayprint:b|<br/>|@@@|\[\[@@@]]}}    -- make links
-  {{#arrayprint:b|<br/>|@@@|\{\{#set:a=@@@\}\} }}   -- make templates
- {{#arrayprint:b|<br/>|@@@|\[\[name::@@@]]}}   -- make SMW links
+  {{#arrayprint:b|<br/>|@@@|[[@@@]]}}    -- embed wiki links
+  {{#arrayprint:b|<br/>|@@@|{{#set:prop=@@@}} }}   -- embed parser function
+ {{#arrayprint:b|<br/>|@@@|{{f.tag{{f.print.vbar}}prop{{f.print.vbar}}@@@}} }}   -- embed template function
+ {{#arrayprint:b|<br/>|@@@|[[name::@@@]]}}   -- make SMW links
  
    {{#arraysize:key}}
 
@@ -221,56 +223,44 @@ class ArrayExtension {
 
     //////////////////////////////////////////////////
     // Display Options:  print array
-    
-    function arrayprint( &$parser, $key , $delimiter = ', ', $pattern='@@@@', $template='@@@@') {
+    /**
+     * print an array
+     *      {{#arrayprint:key|delimiter|search|subject}}
+     * example
+     */
+    function arrayprint( &$parser, $key , $delimiter = ', ', $search='@@@@', $subject='@@@@', $frame=null) {
         if (!isset($key))
 	   return '';
-
-        $option='values';
-        if ($key =='')
-	   $option='keys';
 	   
-	//clearn up  BY unescaping stuff
-	//if (!empty($template)){
-	//	$template = str_replace('\\[','[',$template);
-	//	$template = str_replace('\\{','{',$template);
-	//	$template = str_replace('\\}','}',$template);
-	//	//$template = str_replace('\\\\','\\',$template);
-	//}	
-
-        switch ($option){
-	case "values":
-		if (isset($this->mArrayExtension)
-                    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key])
-                ){
-			$rendered_values= array();
-			if (!empty($pattern)&& !empty($template)){
-				foreach($this->mArrayExtension[$key] as $v){
-					$rendered_values[] = str_replace($pattern, $v, $template);
-				}
-			}
-			// print the entire key
-		        return implode( $delimiter, $rendered_values );
-		}else{
-			return "undefined array: $key";
-		}
-		break;
-	case "keys":
-	        if (is_array($this->mArrayExtension)) {
-			if (!empty($pattern)&& !empty($template)){
-				foreach($this->mArrayExtension as $v){
-					$rendered_values[] = str_replace($pattern, $v, $template);
-				}
-			}
-			// print the entire key
-		        return implode( $delimiter, $rendered_values );
-		}else{
-		   return '';
-		}
-		break;
-       }
+        if (!isset($this->mArrayExtension))
+ 	   return "undefined array: $key";
+	
+        if (!array_key_exists($key,$this->mArrayExtension) || !is_array($this->mArrayExtension[$key]))
+ 	   return "undefined array: $key";
+	   
+	$values=$this->mArrayExtension[$key];    
+	$rendered_values= array();
+	foreach($values as $v){
+		$temp_result_value  = str_replace($search, $v, $subject);
+		if (isset($frame)){
+			$temp_result_value = $parser->preprocessToDom($temp_result_value, $frame->isTemplate() ? Parser::PTD_FOR_INCLUSION : 0);
+			$temp_result_value = trim($frame->expand($temp_result_value));
+                }                  
+		$rendered_values[] = $temp_result_value ;
+	}
+	return array(implode( $delimiter, $rendered_values) , 'noparse' => false, 'isHTML' => false);
     }
    
+    function arrayprintObj(  &$parser, $frame, $args ) {
+		// Set variables
+	$key = isset($args[0]) ? trim($frame->expand($args[0])) : '';
+	$delimiter = isset($args[1]) ? trim($frame->expand($args[1])) : ', ';
+	$search = isset($args[2]) ? trim($frame->expand($args[2], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
+	$subject = isset($args[3]) ? trim($frame->expand($args[3], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
+
+	return $this->arrayprint($parser, $key, $delimiter, $search, $subject, $frame);
+    }
+
     function arrayindex( &$parser, $key , $index ) {
         if (!isset($key) || !isset($index))
 	   return '';
@@ -468,7 +458,16 @@ function wfSetupArrayExtension() {
  
     $wgParser->setFunctionHook( 'arraydefine', array( &$wgArrayExtension, 'arraydefine' ) );
 
-    $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
+		if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
+			//$parser->setFunctionHook('arraymap', array('SFParserFunctions', 'renderArrayMapObj'), SFH_OBJECT_ARGS);
+			//$parser->setFunctionHook('arraymaptemplate', array('SFParserFunctions', 'renderArrayMapTemplateObj'), SFH_OBJECT_ARGS);
+			$wgParser->setFunctionHook('arrayprint', array( &$wgArrayExtension, 'arrayprintObj' ), SFH_OBJECT_ARGS);
+		} else {
+			//$parser->setFunctionHook('arraymap', array('SFParserFunctions', 'renderArrayMap'));
+	    $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
+		}
+
+//    $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
     $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
     $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
     $wgParser->setFunctionHook( 'arraysearch', array( &$wgArrayExtension, 'arraysearch' ) );
