@@ -9,6 +9,7 @@
  changelog
  * Feb 8, 2009 version 1.1.1
     - update #arrayprint, now wiki links, parser functions and templates properly parsed. This enables foreach loop call.
+    - update #arraysearch, now allows customized output upon found/non-found by specifying additional parameters
  * Feb 5, 2009 version 1.1
     - update #arraydefine: replacing  'explode' by 'preg_split', 
            and we now allow delimitors to  be (i) a string; or (ii) a perl regular expressnion pattern, sourrounded by '/', e.g. '/..blah.../'
@@ -32,109 +33,6 @@
  * Jan 27, 2009  version 1.0.1 
     - changed arraydefine (allow defining empty array)
  
- 
- == Part1. constructor ==
- {{#arraydefine:key|values|delimiter}}
-
- Define an array by a list of 'values' deliminated by 'delimiter', 
- the delimiter should be perl regular expression pattern
- * http://us2.php.net/manual/en/book.pcre.php
- * see also: http://us2.php.net/manual/en/function.preg-split.php
- 
- 
- 
- == Part2. print functions ==
-
- {{#arrayprint:key|delimiter|search|subject}}
-
- foreach value of the array, print 'subject' where  all occurrences of 'search' is replaced with the value, deliminated by 'delimiter'
-  
- notes:
-* the subject can embed parser functions; wiki links; and templates.
- 
- examples:
- {{#arrayprint:b}}    -- simple
-  {{#arrayprint:b|<br/>}}    -- add change line
-  {{#arrayprint:b|<br/>|@@@|[[@@@]]}}    -- embed wiki links
-  {{#arrayprint:b|<br/>|@@@|{{#set:prop=@@@}} }}   -- embed parser function
- {{#arrayprint:b|<br/>|@@@|{{f.tag{{f.print.vbar}}prop{{f.print.vbar}}@@@}} }}   -- embed template function
- {{#arrayprint:b|<br/>|@@@|[[name::@@@]]}}   -- make SMW links
- 
-   {{#arraysize:key}}
-
-   Print the size (number of elements) in the specified array
-  See: http://www.php.net/manual/en/function.count.php
-   
-   
-   
-   {{#arraysearch:key|value}}
-
-   print "1" or "0" to show whether the value is a member of the array identified by key
-   See: http://www.php.net/manual/en/function.in-array.php
-   
- 
-   {{#arrayindex:key|index}}
-
-   print the value of an array (identified by key)  by the index, invalid index result in nothing being printed. note the index is 0-based.
- 
-
- == Part3. alter array ==
-   
-   
-   {{#arraysort:key|order}}
-   
-   sort specified array in the following order:
-    * none (default)  - no sort   
-   *  desc - in descending order, large to small
-   *  asce - in ascending order, small to large
-   * random - shuffle the arrry in random order
-   see: http://www.php.net/manual/en/function.sort.php
-          http://www.php.net/manual/en/function.rsort.php
-          http://www.php.net/manual/en/function.shuffle.php
-   
-   {{#arrayunique:key}}
-
-   make the array identified by key a set (all elements are unique)
-   see: http://www.php.net/manual/en/function.array-unique.php
-          
-
-    {{#arrayreset:}}
-
-   reset all defined arrayes
-       
-   == Part4. create a new array ==
-   
-   {{#arraymerge:key|key1|key2}}
-   
-   merge values two arrayes identified by key1 and key2 into a new array identified by key.
-   this merge differs from array_merge of php because it merges values.
-   
-     {{#arrayslice:key|key1|offset|length}}
-
-    extract a slice from an  array
-    see: http://www.php.net/manual/en/function.array-slice.php
-  
-    == Part 5.  create a new array, set operations ==
-    
-    {{#arrayintersect:key|key1|key2}}
-    
-    set operation,    {red} = {red, white} intersect {red,black}
-   See: http://www.php.net/manual/en/function.array-intersect.php
-
-
-   
-    {{#arrayunion:key|key1|key2}}
-    
-    set operation,    {red, white} = {red, white} union {red}
-    similar to arraymerge, this union works on values.
-
-    
-    
-    {{#arraydiff:key|key1|key2}}
-    
-    set operation,    {white} = {red, white}  -  {red}
-    see: http://www.php.net/manual/en/function.array-diff.php
-   
 
  -------------------------------------------
  the following fuctions are obsoleted
@@ -192,8 +90,19 @@ $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
  */ 
 class ArrayExtension {
     var $mArrayExtension; 
+
+///////////////////////////////////////////////////////////
+// PART 1. constructor
+///////////////////////////////////////////////////////////
  
-    // define an array variable
+/**
+* Define an array by a list of 'values' deliminated by 'delimiter', 
+* the delimiter should be perl regular expression pattern
+*      {{#arraydefine:key|values|delimiter}}
+*
+* http://us2.php.net/manual/en/book.pcre.php
+* see also: http://us2.php.net/manual/en/function.preg-split.php
+*/
     function arraydefine( &$parser, $key, $value='', $delimiter = '/\s*,\s*/', $option = 'all', $sort = 'none') {
         if (!isset($key))
 	   return '';
@@ -220,14 +129,25 @@ class ArrayExtension {
 	return '';
     }
 
+///////////////////////////////////////////////////////////
+// PART 2. print
+///////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////
-    // Display Options:  print array
-    /**
-     * print an array
-     *      {{#arrayprint:key|delimiter|search|subject}}
-     * example
-     */
+/**
+* print an array.
+* foreach element of the array, print 'subject' where  all occurrences of 'search' is replaced with the element, 
+* and each element print-out is deliminated by 'delimiter'
+* The subject can embed parser functions; wiki links; and templates.
+* usage
+*      {{#arrayprint:key|delimiter|search|subject}}
+* examples:
+*    {{#arrayprint:b}}    -- simple
+*    {{#arrayprint:b|<br/>}}    -- add change line
+*    {{#arrayprint:b|<br/>|@@@|[[@@@]]}}    -- embed wiki links
+*    {{#arrayprint:b|<br/>|@@@|{{#set:prop=@@@}} }}   -- embed parser function
+*    {{#arrayprint:b|<br/>|@@@|{{f.tag{{f.print.vbar}}prop{{f.print.vbar}}@@@}} }}   -- embed template function
+*    {{#arrayprint:b|<br/>|@@@|[[name::@@@]]}}   -- make SMW links
+*/ 
     function arrayprint( &$parser, $key , $delimiter = ', ', $search='@@@@', $subject='@@@@', $frame=null) {
         if (!isset($key))
 	   return '';
@@ -261,6 +181,11 @@ class ArrayExtension {
 	return $this->arrayprint($parser, $key, $delimiter, $search, $subject, $frame);
     }
 
+/**
+* print the value of an array (identified by key)  by the index, invalid index result in nothing being printed. note the index is 0-based.
+* usage
+*   {{#arrayindex:key|index}}
+*/
     function arrayindex( &$parser, $key , $index ) {
         if (!isset($key) || !isset($index))
 	   return '';
@@ -275,7 +200,14 @@ class ArrayExtension {
        return '';
     }
    
-    // return size of array
+/**
+* return size of array.
+* Print the size (number of elements) in the specified array
+* usage
+*   {{#arraysize:key}}
+*
+*  See: http://www.php.net/manual/en/function.count.php
+*/
     function arraysize( &$parser, $key) {
         if (!isset($key) )
 	   return '';
@@ -287,33 +219,59 @@ class ArrayExtension {
 	}
        return '';
     }    
-    
-    // locate the index of the first occurence of an element, return -1 if not found
-    function arraysearch( &$parser, $key, $needle) {
+
+/**
+* locate the index of the first occurence of an element
+*   - print "-1" or index to show the index of the first occurence of 'value' in the array identified by key
+*    - if 'yes' and 'no' are set, print value of them when found or not-found
+* usage
+*   {{#arraysearch:key|value|yes|no}}
+*
+*   See: http://www.php.net/manual/en/function.array-search.php
+*/   
+    function arraysearch( &$parser, $key, $needle, $yes, $no) {
         if (!isset($key) || !isset($needle) || strlen($needle)===0)
 	   return '';
 
         if (isset($this->mArrayExtension)    
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    if (false !== ($ret = array_search($needle, $this->mArrayExtension[$key], true)))
+	    if (false !== ($ret = array_search($needle, $this->mArrayExtension[$key], true))){
+	       if (isset($yes))
+	          $ret=$yes;
 	       return $ret;	       
+	    }
         }
-	return '-1';
+	$ret = -1;
+        if (isset($no))
+	  $ret=$no;
+	return $ret;
     }        
    
 
    
-   //////////////////////////////////////////////////
-    // alter an array   
+///////////////////////////////////////////////////////////
+// PART 3. alter an array   
+///////////////////////////////////////////////////////////
     
-    // reset memory
-    function arrayreset( &$parser) {
+/**
+* reset all defined arrayes
+* usage
+*    {{#arrayreset:}}
+*/
+   function arrayreset( &$parser) {
 	$this->mArrayExtension = array();
 	return '';
     }    
     
-    // convert an array to set
+/**
+* convert an array to set
+* convert the array identified by key into a set (all elements are unique)
+* usage
+*   {{#arrayunique:key}}
+*
+*   see: http://www.php.net/manual/en/function.array-unique.php
+*/
     function arrayunique( &$parser, $key ) {
         if (!isset($key))
 	   return '';
@@ -332,7 +290,20 @@ class ArrayExtension {
 	return '';
     }    
 
-    // sort an array 
+/**
+* sort an array 
+*   sort specified array in the following order:
+*   * none (default)  - no sort   
+*   *  desc - in descending order, large to small
+*   *  asce - in ascending order, small to large
+*   * random - shuffle the arrry in random order
+* usage
+*   {{#arraysort:key|order}}
+*   
+*   see: http://www.php.net/manual/en/function.sort.php
+*          http://www.php.net/manual/en/function.rsort.php
+*          http://www.php.net/manual/en/function.shuffle.php
+*/ 
     function arraysort( &$parser, $key , $sort = 'none') {
         if (!isset($key))
 	   return '';
@@ -352,11 +323,17 @@ class ArrayExtension {
 	return '';
     }    
     
-
-    //////////////////////////////////////////////////
-    // create  an array   
-    
-    // merge two arrays,  keep duplicated values 
+///////////////////////////////////////////////////////////
+// PART 4. create an array   
+///////////////////////////////////////////////////////////
+/**
+* merge two arrays,  keep duplicated values 
+* usage
+*   {{#arraymerge:key|key1|key2}}
+*   
+*  merge values two arrayes identified by key1 and key2 into a new array identified by key.
+*  this merge differs from array_merge of php because it merges values.
+*/   
     function arraymerge( &$parser, $key, $key1, $key2='' ) {
         if (!isset($key) ||!isset($key1) )
 	   return '';
@@ -378,8 +355,14 @@ class ArrayExtension {
 	return '';
     }    
 
-    // extract a slice from an array
-    // http://us3.php.net/manual/en/function.array-slice.php
+/**
+* extract a slice from an array
+* usage
+*     {{#arrayslice:key|key1|offset|length}}
+*
+*    extract a slice from an  array
+*    see: http://www.php.net/manual/en/function.array-slice.php
+*/   
     function arrayslice( &$parser, $key , $key1 , $offset, $length='') {
         if (!isset($key) || !isset($key1) || !isset($offset))
 	   return '';
@@ -398,27 +381,17 @@ class ArrayExtension {
 		    $this->mArrayExtension[$key] = array_values($temp);
         }
 	return '';
-    }    
-
-    //////////////////////////////////////////////////
-    // SET OPERATIONS:    a set does not have duplicated element
+    }     
     
-    // merge two sets
-    function arrayunion( &$parser, $key , $key1 , $key2 ) {
-        if (!isset($key) ||!isset($key1) || !isset($key2))
-	   return '';
-
-        if (isset($this->mArrayExtension)    
-	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1])
-	     && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2]) 
-	){
-     	    $this->arraymerge($parser, $key, $key1, $key2);
-	    $this->mArrayExtension[$key] = array_unique ($this->mArrayExtension[$key]);
-        }
-	return '';
-    }    
-
-    // intersect two sets
+//////////////////////////////////////////////////
+// SET OPERATIONS:    a set does not have duplicated element
+    
+/**
+*  set operation,    {red} = {red, white} intersect {red,black}
+* usage
+*    {{#arrayintersect:key|key1|key2}}
+*   See: http://www.php.net/manual/en/function.array-intersect.php
+*/ 
     function arrayintersect( &$parser, $key , $key1 , $key2 ) {
         if (!isset($key) ||!isset($key1) ||!isset($key2))
 	   return '';
@@ -432,7 +405,37 @@ class ArrayExtension {
 	return '';
     }    
     
-    // diff  two sets, subset test
+
+/**
+*    set operation,    {red, white} = {red, white} union {red}
+* usage
+*    {{#arrayunion:key|key1|key2}}
+    
+*    similar to arraymerge, this union works on values.
+*/ 
+    
+    function arrayunion( &$parser, $key , $key1 , $key2 ) {
+        if (!isset($key) ||!isset($key1) || !isset($key2))
+	   return '';
+
+        if (isset($this->mArrayExtension)    
+	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1])
+	     && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2]) 
+	){
+     	    $this->arraymerge($parser, $key, $key1, $key2);
+	    $this->mArrayExtension[$key] = array_unique ($this->mArrayExtension[$key]);
+        }
+	return '';
+    }          
+/**
+*
+* usage
+*    {{#arraydiff:key|key1|key2}}
+    
+*    set operation,    {white} = {red, white}  -  {red}
+*    see: http://www.php.net/manual/en/function.array-diff.php
+*/        
+
     function arraydiff( &$parser, $key , $key1 , $key2 ) {
         if (!isset($key) ||!isset($key1) ||!isset($key2))
 	   return '';
@@ -445,8 +448,6 @@ class ArrayExtension {
         }
 	return '';
     }    
-
-
 
     
 }
