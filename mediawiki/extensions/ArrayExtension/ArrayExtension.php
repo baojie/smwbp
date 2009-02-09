@@ -459,16 +459,12 @@ function wfSetupArrayExtension() {
  
     $wgParser->setFunctionHook( 'arraydefine', array( &$wgArrayExtension, 'arraydefine' ) );
 
-		if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
-			//$parser->setFunctionHook('arraymap', array('SFParserFunctions', 'renderArrayMapObj'), SFH_OBJECT_ARGS);
-			//$parser->setFunctionHook('arraymaptemplate', array('SFParserFunctions', 'renderArrayMapTemplateObj'), SFH_OBJECT_ARGS);
-			$wgParser->setFunctionHook('arrayprint', array( &$wgArrayExtension, 'arrayprintObj' ), SFH_OBJECT_ARGS);
-		} else {
-			//$parser->setFunctionHook('arraymap', array('SFParserFunctions', 'renderArrayMap'));
-	    $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
-		}
+    if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
+	$wgParser->setFunctionHook('arrayprint', array( &$wgArrayExtension, 'arrayprintObj' ), SFH_OBJECT_ARGS);
+    } else {
+	$wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
+    }
 
-//    $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
     $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
     $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
     $wgParser->setFunctionHook( 'arraysearch', array( &$wgArrayExtension, 'arraysearch' ) );
