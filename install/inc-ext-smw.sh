@@ -97,3 +97,17 @@ then
 else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
+
+
+# SemanticToolkit 
+echo "SemanticToolkit"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="SemanticToolkit"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi

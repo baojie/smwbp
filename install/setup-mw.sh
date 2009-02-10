@@ -15,7 +15,7 @@ fi
 ###################################################
 # Install Mediawiki (MW, 1.13)
 ###################################################
-echo "Mediawiki 1.13.3"
+echo "Mediawiki 1.13"
 if [ -d $WIKI_DIR ]
 then
   echo "updating...";
