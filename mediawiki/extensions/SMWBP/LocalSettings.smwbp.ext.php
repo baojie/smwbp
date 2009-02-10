@@ -104,4 +104,12 @@ $extension='extensions/SemanticResultFormats/SRF_Settings.php';
 if (file_exists($extension))
    require_once($extension);
 
+## --- Semantic Toolkit--- 
+# tools for enhancing user experiences with Semantic Wiki
+# svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SemanticToolkit/
+
+$extension='extensions/SemanticToolkit/SemanticToolkit.php';
+if (file_exists($extension))
+   require_once($extension);
+   
 ?>
