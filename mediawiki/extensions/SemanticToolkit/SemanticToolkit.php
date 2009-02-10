@@ -244,7 +244,24 @@ class SemanticToolkit {
     }
 
 
+    function smartprint( &$parser, $value , $search, $subject) {
+	if (empty($value)){
+		return '';
+	}
+	
+	if (empty($search) || empty($subject)){
+		return $value;
+	}else{
+		return str_replace($search, $value, $subject);
+	}
+    }
     
+    function smartprintObj(  &$parser, $frame, $args ) {
+	return $this->smartset($parser, 
+		isset($args[0]) ? trim($frame->expand($args[0])) : '', 
+		isset($args[1]) ? trim($frame->expand($args[1])) : '', 
+		isset($args[2]) ? trim($frame->expand($args[2])) : '');
+    }
 }
  
 function wfSetupSemanticToolkit() {
@@ -258,6 +275,12 @@ function wfSetupSemanticToolkit() {
 	$wgParser->setFunctionHook( 'smartset', array( &$wgSemanticToolkit, 'smartset' ) );
     }
     
+    if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
+	$wgParser->setFunctionHook('smartprint', array( &$wgSemanticToolkit, 'smartprint' ), SFH_OBJECT_ARGS);
+    } else {
+	$wgParser->setFunctionHook( 'smartprint', array( &$wgSemanticToolkit, 'smartprint' ) );
+    }
+
     //$wgParser->setFunctionHook( 'smartshow', array( &$wgSemanticToolkit, 'smartshow' ) );  // f.show
 
 }

@@ -14,7 +14,7 @@ function efSemanticToolkitWords( $lang ) {
          */
         $words['en'] = array(
                 'smartset'    => array( 0, 'smartset' ),
-                'smartshow'          => array( 0, 'smartshow' ),
+                'smartprint'          => array( 0, 'smartprint' ),
 
         );
  
