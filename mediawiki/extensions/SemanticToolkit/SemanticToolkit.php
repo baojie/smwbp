@@ -250,14 +250,14 @@ class SemanticToolkit {
 	}
 	
 	if (empty($search) || empty($subject)){
-		return $value;
+		return ''.$value;
 	}else{
-		return str_replace($search, $value, $subject);
+		return ''.str_replace($search, $value, $subject);
 	}
     }
     
     function smartprintObj(  &$parser, $frame, $args ) {
-	return $this->smartset($parser, 
+	return $this->smartprint($parser, 
 		isset($args[0]) ? trim($frame->expand($args[0])) : '', 
 		isset($args[1]) ? trim($frame->expand($args[1])) : '', 
 		isset($args[2]) ? trim($frame->expand($args[2])) : '');
@@ -276,7 +276,7 @@ function wfSetupSemanticToolkit() {
     }
     
     if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
-	$wgParser->setFunctionHook('smartprint', array( &$wgSemanticToolkit, 'smartprint' ), SFH_OBJECT_ARGS);
+	$wgParser->setFunctionHook('smartprint', array( &$wgSemanticToolkit, 'smartprintObj' ), SFH_OBJECT_ARGS);
     } else {
 	$wgParser->setFunctionHook( 'smartprint', array( &$wgSemanticToolkit, 'smartprint' ) );
     }
