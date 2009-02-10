@@ -236,7 +236,7 @@ class SemanticToolkit {
 	}
 	return $ret;
     }
-   
+
     function smartsetObj(  &$parser, $frame, $args ) {
 	return $this->smartset($parser, 
 		isset($args[0]) ? trim($frame->expand($args[0])) : '', 
@@ -244,15 +244,32 @@ class SemanticToolkit {
     }
 
 
-    function smartprint( &$parser, $value , $search, $subject) {
+/**
+  print a string to fit in template
+  {{#smartprint:value|search|subject}}
+  
+  - value and subject can have template and parser functions
+*/    
+    function smartprint( &$parser, $value , $search, $subject, $frame=null) {
 	if (empty($value)){
 		return '';
 	}
 	
+	if (isset($frame)){
+		$value = $parser->preprocessToDom($value, $frame->isTemplate() ? Parser::PTD_FOR_INCLUSION : 0);
+		$value = trim($frame->expand($value));
+	}                  
+	
 	if (empty($search) || empty($subject)){
 		return ''.$value;
 	}else{
-		return ''.str_replace($search, $value, $subject);
+		$temp_value =str_replace($search, $value, $subject);
+		if (isset($frame)){
+			$temp_value = $parser->preprocessToDom($temp_value, $frame->isTemplate() ? Parser::PTD_FOR_INCLUSION : 0);
+			$temp_value = trim($frame->expand($temp_value));
+                }                  
+	
+		return array($temp_value, 'noparse' => false, 'isHTML' => false);
 	}
     }
     
@@ -260,7 +277,7 @@ class SemanticToolkit {
 	return $this->smartprint($parser, 
 		isset($args[0]) ? trim($frame->expand($args[0])) : '', 
 		isset($args[1]) ? trim($frame->expand($args[1])) : '', 
-		isset($args[2]) ? trim($frame->expand($args[2])) : '');
+		isset($args[2]) ? trim($frame->expand($args[2], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '');
     }
 }
  
