@@ -192,3 +192,17 @@ then
 else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
+
+
+# Lockdown (http://www.mediawiki.org/wiki/Extension:Lockdown)
+echo "http://www.mediawiki.org/wiki/Extension:Lockdown"
+
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="Lockdown"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
