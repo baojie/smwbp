@@ -10,7 +10,7 @@
 ## #######################################
 
 # MW 1.14 did set this value to 20M, but that is not enough
-ini_set( 'memory_limit', '60M' );
+ini_set( 'memory_limit', '128M' );
 
 # include SMW
 include_once('extensions/SemanticMediaWiki/includes/SMW_Settings.php');
