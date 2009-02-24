@@ -1,12 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1.3
+ verion: 1.1.4
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 23 Feburary 2009
+ update: 24 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 23, 2009 version 1.1.4
+   - fixed #arraysearch, better recognize perl patterns identified by starting with "/", http://www.perl.com/doc/manual/html/pod/perlre.html
  * Feb 23, 2009 version 1.1.3
    - fixed #arraysearch, "Warning: Missing argument 4..."
  * Feb 9, 2009 version 1.1.2
@@ -84,7 +86,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.1.3',
+        'version' => '1.1.4',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
@@ -247,7 +249,8 @@ class ArrayExtension {
         if (isset($this->mArrayExtension)    
 	    && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
-	    $bIsPreg= (0===strpos($needle,'/') && (strlen($needle)-1)===strrpos($needle,'/'));
+	//TODO we need a better way to decide perl expresion.
+	    $bIsPreg= (0===strpos($needle,'/') );
 	    $ret = false;
 	    for ($i=$offset; $i< count($this->mArrayExtension[$key]) ;$i++){
 	        $value = $this->mArrayExtension[$key][$i];
