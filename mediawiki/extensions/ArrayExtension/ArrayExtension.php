@@ -1,12 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1.2
+ verion: 1.1.3
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 09 Feburary 2009
+ update: 23 Feburary 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Feb 23, 2009 version 1.1.3
+   - fixed #arraysearch, "Warning: Missing argument 4..."
  * Feb 9, 2009 version 1.1.2
     - update #arraysearch, now support offset and preg regular expression
  * Feb 8, 2009 version 1.1.1
@@ -82,7 +84,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.1.2',
+        'version' => '1.1.3',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
@@ -232,7 +234,7 @@ class ArrayExtension {
 *   See: http://www.php.net/manual/en/function.array-search.php
 *   note it is extended to support regular expression match and offset
 */   
-    function arraysearch( &$parser, $key, $needle, $offset, $yes, $no) {
+    function arraysearch( &$parser, $key, $needle, $offset=null, $yes=null, $no=null) {
         if (!isset($key) || !isset($needle) || strlen($needle)===0 )
 	   return '';
         if (isset($offset)){
