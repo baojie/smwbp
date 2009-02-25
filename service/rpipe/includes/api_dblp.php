@@ -97,7 +97,7 @@ class api_dblp{
 	
 	/** print bibtex list
 	 */
-	function printBibtex($data, $source, $format='bibtex', $timestamp=''){
+	function printBibtex($data, $source, $format='bibtex', $timestamp='', $tag=''){
 		$ret = "";
 		switch ($format){
 		case "xml":
@@ -121,7 +121,7 @@ class api_dblp{
     <title><![CDATA['.strtolower($bib->entry->get_field('title')).']]></title>
     <revision>   
       <timestamp>'.$timestamp.'</timestamp>
-      <text xml:space="preserve"><![CDATA['.$this->print_i_publication($bib).']]></text>
+      <text xml:space="preserve"><![CDATA['.$this->print_i_publication($bib, $tag).']]></text>
     </revision>
   </page>';
 			break;
@@ -135,7 +135,7 @@ class api_dblp{
 		return $ret;		
 	}
 	
-	function print_i_publication($bib){
+	function print_i_publication($bib,$tag){
 		$bibtype = $bib->entry->type_specifier;
 		$bibkey = $bib->entry->key_identifier;
 		$bibfields= $bib->entry->fields;		
@@ -145,6 +145,9 @@ class api_dblp{
 		$templ .= "  |key=".$bibkey."\n";
 		foreach ($bibfields as $field_name=>$field_value ){
 		   $templ .= "  |".$field_name." = ".$field_value."\n";
+		}
+		if (!empty($tag)){
+			$templ .= "  |tag=".$tag."\n";
 		}
 		$templ .= "}}";	
 		

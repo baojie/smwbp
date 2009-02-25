@@ -54,7 +54,10 @@ if (empty($m_output_option)){
 }
 
 $m_tag=$_GET["tag"];  //tag of paper
-  
+if (empty($m_tag)){
+  $m_tag="";	
+}
+
 //load dblp url
 $contents = $myweb->load($m_url);
 if (empty($contents)){
@@ -80,6 +83,7 @@ switch ($m_output_option){
   case "xml":
      $myweb->printBegin("xml"); break;
 }
+date_default_timezone_set('UTC');
 $timestamp= date('Y-m-d\TH:i:s\Z');
 
 
@@ -109,7 +113,7 @@ if ($m_bAuthorUrl){
 		  exit();
 	   }
 	   //print dblp data
-	   $out = $mydblp->printBibtex($data_bib,$url,$format,$timestamp);
+	   $out = $mydblp->printBibtex($data_bib,$url,$format,$timestamp,$m_tag);
 	   print ($out);
 	}
 }else{
