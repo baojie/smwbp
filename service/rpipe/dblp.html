@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type" />
+  <link href="http://inference-web.org/iw.css" rel="stylesheet" type="text/css" /> 
+  <title>RPIPE: DBLP Converter</title>
+  <script language="javascript">
+function demo1(){
+  document.getElementById("url").value = "http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html" ;
+  document.getElementById("fn").value = "" ;
+  document.getElementById("mi").value = "" ;
+  document.getElementById("ln").value = "" ;
+  alert('example dblp url is set, please click submit query button');
+}
+function demo2(){
+  document.getElementById("url").value = "http://dblp.uni-trier.de/rec/bibtex/conf/www/DingTM08" ;
+  document.getElementById("fn").value = "" ;
+  document.getElementById("mi").value = "" ;
+  document.getElementById("ln").value = "" ;
+  alert('example dblp url is set, please click submit query button');
+}
+function demo3(){
+  document.getElementById("url").value = "" ;
+  document.getElementById("fn").value = "Deborah" ;
+  document.getElementById("mi").value = "L" ;
+  document.getElementById("ln").value = "McGuinness" ;
+  alert('example dblp author name is set, please click submit query button');
+}
+  </script>
+</head>
+<body>
+<h1>RPIPE: DBLP Converter</h1>
+<h2>service</h2> 
+<form action="ws_dblp.php" name="dblp" border=1>
+  <fieldset><legend>1. specify a DBLP target&nbsp; </legend>DBLP
+url: &nbsp;<input size="140" id="url" name="url" /><br />
+or<br />
+AUTHOR: first name(required): <input id="fn" name="fn" />
+&nbsp;&nbsp; initial letter of middle name: <input id="mi"  name="mi" />
+&nbsp; last name(required)<input id="ln"  name="ln" /><br />
+  </fieldset>
+  <fieldset><legend>2. options</legend>output output_option:
+&nbsp;
+  <select id="output_option" name="output_option">
+  <option>i.publication</option>
+  <option>bibtex</option>
+  <option>xml</option>
+  </select>
+  </fieldset>
+   <fieldset><legend>3. submit</legend><input type="submit" /><br />
+    </fieldset>
+</form>
+
+<h2>description</h2> 
+We offer a REST services for converting an authors' publications information on DBLP into various formats
+<ul>
+<li> xml: this allows any xslt translation to pipe on it </li>
+<li> bibtex: this aggregates bibtex of all publications on one page </li> 
+<li> i.publication: this generates an xml dump for a set of wiki pages, you may than import them into your wiki. </li>
+</ul>
+
+
+<h2>examples</h2> 
+<form>
+<input
+ name="button1" value="demo1: from DBLP author page"  onclick="demo1();" type="button" />
+<br/>
+<input name="button2"
+ value="demo2: from DBLP bibtex page" onclick="demo2();" type="button" />
+<br/>
+<input name="button3"
+ value="demo3: specify author name" onclick="demo3();" type="button" /><br />
+</form>  
+
+<p/>
+<p/>
+<p/>
+<div style="text-align:center">
+This service is a free community service to the public Web. The data is obtained from <a href="http://www.informatik.uni-trier.de/~ley/db/">DBLP</a>. <br/>
+This page is last updated on Feb 4, 2009. Should you have any concern, please contact  tw-webmaster AT cs DOT rpi DOT edu.  <br/>
+</div>
+</body>
+</html>
