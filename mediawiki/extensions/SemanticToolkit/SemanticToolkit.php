@@ -92,13 +92,14 @@ class SemanticToolkit {
 	//parse property and value
 	if (!empty($propertyvalue)){
 		$temp = explode('=',$propertyvalue,2);
-		if (!empty($temp[0]) && !empty($temp[1])){
+		if (isset($temp[0]) && isset($temp[1])){
 		  $my_property= trim($temp[0]);
 		  $my_value= trim($temp[1]);
 		}
 	}
-	if (empty($my_property)||empty($my_value))
+	if (empty($my_property)||(empty($my_value) && strlen($temp[1])===0 ))
 	   return '';
+
 	   
 
 	//parse options
@@ -237,6 +238,9 @@ class SemanticToolkit {
 	return $ret;
     }
 
+/**
+  print a string to fit in template
+*/    
     function smartsetObj(  &$parser, $frame, $args ) {
 	return $this->smartset($parser, 
 		isset($args[0]) ? trim($frame->expand($args[0])) : '', 
@@ -244,12 +248,6 @@ class SemanticToolkit {
     }
 
 
-/**
-  print a string to fit in template
-  {{#smartprint:value|search|subject}}
-  
-  - value and subject can have template and parser functions
-*/    
     function smartprint( &$parser, $value , $search, $subject, $frame=null) {
 	if (empty($value)){
 		return '';
