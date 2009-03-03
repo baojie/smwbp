@@ -126,7 +126,7 @@ if ($m_bAuthorUrl){
 	  exit();
 	}
 	//print dblp data
-	$out = $mydblp->printBibtex($data_bib,$url,$format,$timestamp);
+	$out = $mydblp->printBibtex($data_bib,$url,$format,$timestamp,$m_tag);
 	
 	print ($out);
 }

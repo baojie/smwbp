@@ -129,7 +129,7 @@ class api_dblp{
 			$bib = new BibTex ($data[0]);
 			$bib->entry->fields["source"] =$source;
 
-			$ret = $this->print_i_publication($bib);
+			$ret = $this->print_i_publication($bib, $tag);
 			break;
 		}
 		return $ret;		

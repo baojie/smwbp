@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type" />
+  <link href="http://inference-web.org/iw.css" rel="stylesheet" type="text/css" /> 
+  <title>RPIPE: DBLP Converter</title>
+  <script language="javascript">
+function demo1(){
+  document.getElementById("url").value = "http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html" ;
+  alert('example dblp url is set, please click submit query button');
+}
+function demo2(){
+  document.getElementById("url").value = "http://dblp.uni-trier.de/rec/bibtex/conf/www/DingTM08" ;
+  alert('example dblp url is set, please click submit query button');
+}
+function demo3(){
+  document.getElementById("url").value = "http://www.informatik.uni-trier.de/~ley/db/conf/semweb/iswc2008.html" ;
+  alert('example dblp url is set, please click submit query button');
+}
+  </script>
+<script type="text/javascript" src="includes/api_bib2template.js">
+</script>
+
+</head>
+<body>
+<h1>RPIPE: Biblography Services</h1>
+<hr/>
+<h2>Service 1: DBLP Importing</h2> 
+<form action="ws_dblp.php" name="dblp" border=1>
+  <fieldset><legend>1. type a DBLP URL for person or proceeding</legend>
+url: <input size="140" id="url" name="url" /> e.g.
+<form>
+<br/>
+Demo1: use DBLP author page: <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html">http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html</a>
+<input
+ name="button1" value="run demo1"  onclick="demo1();" type="button" />
+<br/>
+Demo2: use DBLP bibtex page: <a href="http://dblp.uni-trier.de/rec/bibtex/conf/www/DingTM08">http://dblp.uni-trier.de/rec/bibtex/conf/www/DingTM08</a>
+<input name="button2"
+ value="run demo2" onclick="demo2();" type="button" />
+<br/>
+Demo3: use DBLP proceedings page: <a href="http://www.informatik.uni-trier.de/~ley/db/conf/semweb/iswc2008.html">http://www.informatik.uni-trier.de/~ley/db/conf/semweb/iswc2008.html</a></li>
+<input name="button3"
+ value="run demo3" onclick="demo3();" type="button" /><br />
+</form>  
+  </fieldset>
+  <fieldset><legend>2. Set options</legend>
+  please set tag(s) for the imported publication(separated by ,), e.g. "semantic web, provenance":<br/>
+  <input size="100" id="tag" name="tag" />  <br/>
+  output output_option:
+&nbsp;
+  <select id="output_option" name="output_option">
+  <option>i.publication</option>
+  <option>bibtex</option>
+  <option>xml</option>
+  </select>
+  </fieldset>
+   <fieldset><legend>3. submit</legend><input type="submit" /><br />
+    Note: once the output has been generate, you may save it and import the dump using special:Import feature of wiki.
+    </fieldset>
+</form>
+
+<h2>description</h2> 
+We offer a REST services for converting an authors' publications information on DBLP into various formats
+<ul>
+<li> xml: this allows any xslt translation to pipe on it </li>
+<li> bibtex: this aggregates bibtex of all publications on one page </li> 
+<li> i.publication: this generates an xml dump for a set of wiki pages, you may than import them into your wiki. </li>
+</ul>
+
+
+<hr/>
+<h2>Service 2: Bibtex Converter</h2>
+<form>
+<table><tr>
+<td>
+<TEXTAREA id="input_bibtex" COLS=60 ROWS=20>@article{DBLP:journals/cacm/WeitznerABFHS08,
+  author    = {Daniel J. Weitzner and
+               Harold Abelson and
+               Tim Berners-Lee and
+               Joan Feigenbaum and
+               James A. Hendler and
+               Gerald J. Sussman},
+  title     = {Information accountability},
+  journal   = {Commun. ACM},
+  volume    = {51},
+  number    = {6},
+  year      = {2008},
+  pages     = {82-87},
+  ee        = {http://doi.acm.org/10.1145/1349026.1349043},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+</TEXTAREA><br/>
+tags(separated by ,)<br/>
+<TEXTAREA id="input_tags" COLS=60 ROWS=2></TEXTAREA>
+</td><td>
+<input value=">>convert>>"  onclick="fn_b2f_main('input_bibtex','output_template', false, 'input_tags');" type="button" />
+</td><td>
+<TEXTAREA id="output_template" COLS=80 ROWS=25></TEXTAREA>
+</td>
+</tr></table>
+</form>  
+
+<p/>
+<p/>
+<p/>
+<div style="text-align:center">
+This service is a free community service to the public Web. The data is obtained from <a href="http://www.informatik.uni-trier.de/~ley/db/">DBLP</a>. <br/>
+This page is last updated on Feb 4, 2009. Should you have any concern, please contact  tw-webmaster AT cs DOT rpi DOT edu.  <br/>
+</div>
+
+</body>
+</html>
