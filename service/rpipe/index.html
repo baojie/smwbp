@@ -29,7 +29,8 @@ function demo3(){
 <h2>Service 1: DBLP Importing</h2> 
 <form action="ws_dblp.php" name="dblp" border=1>
   <fieldset><legend>1. type a DBLP URL for person or proceeding</legend>
-url: <input size="140" id="url" name="url" /> e.g.
+url: <input size="140" id="url" name="url" />  <i>( URL of a DBLP page) </i>
+<div style="margin-left:30px;font-size:small">
 <form>
 <br/>
 Demo1: use DBLP author page: <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html">http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ding:Li.html</a>
@@ -44,10 +45,10 @@ Demo3: use DBLP proceedings page: <a href="http://www.informatik.uni-trier.de/~l
 <input name="button3"
  value="run demo3" onclick="demo3();" type="button" /><br />
 </form>  
+</div>
   </fieldset>
   <fieldset><legend>2. Set options</legend>
-  please set tag(s) for the imported publication(separated by ,), e.g. "semantic web, provenance":<br/>
-  <input size="100" id="tag" name="tag" />  <br/>
+  tags: <input size="100" id="tag" name="tag" />  <i>( please set tag(s) for the imported publication(separated by ,), e.g. "semantic web, provenance":) </i><br/>
   output output_option:
 &nbsp;
   <select id="output_option" name="output_option">
@@ -56,18 +57,18 @@ Demo3: use DBLP proceedings page: <a href="http://www.informatik.uni-trier.de/~l
   <option>xml</option>
   </select>
   </fieldset>
-   <fieldset><legend>3. submit</legend><input type="submit" /><br />
-    Note: once the output has been generate, you may save it and import the dump using special:Import feature of wiki.
+   <fieldset><legend>3. submit</legend><input type="submit" />      Note: once the output has been generate, you may save it and import the dump using special:Import feature of wiki.
     </fieldset>
 </form>
 
-<h2>description</h2> 
-We offer a REST services for converting an authors' publications information on DBLP into various formats
+<p>
+note: This service is a community service to the public Web. The data is obtained from <a href="http://www.informatik.uni-trier.de/~ley/db/">DBLP</a>. This REST service can convert multiple DBLP pages into various formats
 <ul>
 <li> xml: this allows any xslt translation to pipe on it </li>
 <li> bibtex: this aggregates bibtex of all publications on one page </li> 
 <li> i.publication: this generates an xml dump for a set of wiki pages, you may than import them into your wiki. </li>
 </ul>
+</p>
 
 
 <hr/>
@@ -106,7 +107,6 @@ tags(separated by ,)<br/>
 <p/>
 <p/>
 <div style="text-align:center">
-This service is a free community service to the public Web. The data is obtained from <a href="http://www.informatik.uni-trier.de/~ley/db/">DBLP</a>. <br/>
 This page is last updated on Feb 4, 2009. Should you have any concern, please contact  tw-webmaster AT cs DOT rpi DOT edu.  <br/>
 </div>
 
