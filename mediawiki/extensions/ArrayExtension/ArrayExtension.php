@@ -1,12 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1.4
+ verion: 1.1.5
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 24 Feburary 2009
+ update: 17 March 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * Mar 17, 2009 version 1.1.5
+   - update #arraysort, add "reverse" option, http://us3.php.net/manual/en/function.array-reverse.php
  * Feb 23, 2009 version 1.1.4
    - fixed #arraysearch, better recognize perl patterns identified by starting with "/", http://www.perl.com/doc/manual/html/pod/perlre.html
  * Feb 23, 2009 version 1.1.3
@@ -86,7 +88,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.1.4',
+        'version' => '1.1.5',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
@@ -330,27 +332,31 @@ class ArrayExtension {
 *   *  desc - in descending order, large to small
 *   *  asce - in ascending order, small to large
 *   * random - shuffle the arrry in random order
+*   * reverse - Return an array with elements in reverse order
 * usage
 *   {{#arraysort:key|order}}
 *   
 *   see: http://www.php.net/manual/en/function.sort.php
 *          http://www.php.net/manual/en/function.rsort.php
 *          http://www.php.net/manual/en/function.shuffle.php
+*          http://us3.php.net/manual/en/function.array-reverse.php
 */ 
     function arraysort( &$parser, $key , $sort = 'none') {
         if (!isset($key))
 	   return '';
-    
         if (isset($this->mArrayExtension)    
 	       && array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]))
 	{
 	    switch ($sort){	
-		case 'asce': sort($this->mArrayExtension[$key]); break;
+		case 'asce': 
 		case 'ascending': sort($this->mArrayExtension[$key]); break;
-		
-		case 'desc': rsort($this->mArrayExtension[$key]); break;
+
+		case 'desc': 
 		case 'descending': rsort($this->mArrayExtension[$key]); break;
+		
 		case 'random': shuffle($this->mArrayExtension[$key]); break;
+
+		case 'reverse': $this->mArrayExtension[$key]= array_reverse($this->mArrayExtension[$key]); break;		
 	    };
         }
 	return '';
