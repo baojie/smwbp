@@ -9,6 +9,7 @@
  changelog
  * Mar 17, 2009 version 1.1.5
    - update #arraysort, add "reverse" option, http://us3.php.net/manual/en/function.array-reverse.php
+   - update #arrayreset, add option to reset a selection of arrays
  * Feb 23, 2009 version 1.1.4
    - fixed #arraysearch, better recognize perl patterns identified by starting with "/", http://www.perl.com/doc/manual/html/pod/perlre.html
  * Feb 23, 2009 version 1.1.3
@@ -290,14 +291,27 @@ class ArrayExtension {
 ///////////////////////////////////////////////////////////
     
 /**
-* reset all defined arrayes
+* reset some or all defined arrayes
 * usage
 *    {{#arrayreset:}}
+*    {{#arrayreset:key1,key2,...keyn}}
 */
-   function arrayreset( &$parser) {
-	$this->mArrayExtension = array();
+   function arrayreset( &$parser, $keys) {
+        if (empty($keys)){
+	    //reset all
+	    $this->mArrayExtension = array();
+	}else{
+	    $arykeys = explode(',', $keys);
+	    foreach ($arykeys as $key){
+		$key = trim($key);
+		if ( array_key_exists($key,$this->mArrayExtension) && is_array($this->mArrayExtension[$key]) ){
+		    unset($this->mArrayExtension[$key]);
+		}
+	    }
+	}
 	return '';
     }    
+  
     
 /**
 * convert an array to set
