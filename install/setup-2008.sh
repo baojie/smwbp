@@ -78,48 +78,6 @@ fi
 ###################################################
 # Install MW Extensions
 ###################################################
-# VariablesExtension (http://www.mediawiki.org/wiki/Extension:Variables)
-echo "http://www.mediawiki.org/wiki/Extension:Variables"
-
-EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
-EXT_NAME="Variables"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-
-# StringFunctions (http://www.mediawiki.org/wiki/Extension:StringFunctions)
-echo "http://www.mediawiki.org/wiki/Extension:StringFunctions"
-
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
-EXT_NAME="StringFunctions"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-
-# ParserFunctions (http://www.mediawiki.org/wiki/Extension:ParserFunctions)
-echo "http://www.mediawiki.org/wiki/Extension:ParserFunctions"
-
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
-EXT_NAME="ParserFunctions"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-
 # LdapAuth (LdapAuth)
 echo "LdapAuth"
 
@@ -138,19 +96,6 @@ echo "http://www.mediawiki.org/wiki/Extension:CategoryTree"
 
 EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
 EXT_NAME="CategoryTree"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-# ArrayExtension (http://www.mediawiki.org/wiki/Extension:ArrayExtension)
-echo "http://www.mediawiki.org/wiki/Extension:ArrayExtension"
-
-EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
-EXT_NAME="ArrayExtension"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";
