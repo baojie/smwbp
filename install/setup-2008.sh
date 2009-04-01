@@ -14,9 +14,9 @@ fi
 
 
 ###################################################
-# Install Mediawiki (MW, 1.13.3)
+# Install Mediawiki (MW, 1.13)
 ###################################################
-echo "Mediawiki 1.13.3"
+echo "Mediawiki 1.13"
 if [ -d $WIKI_DIR ]
 then
   echo "updating...";
@@ -74,3 +74,32 @@ else
   rm SemanticResultFormats.tar.gz
 fi
 
+###################################################
+# Install SMW Extensions
+###################################################
+# Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
+
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticForms"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
+
+# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
+
+EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_NAME="SemanticDrilldown"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
