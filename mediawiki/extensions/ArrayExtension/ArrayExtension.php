@@ -1,12 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.1.5
+ verion: 1.1.6
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 17 March 2009
+ update: 17 April 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * April 18, 2009 version 1.1.6
+   - fixed a bug in arraymerge and arrayslice,  
  * Mar 17, 2009 version 1.1.5
    - update #arraysort, add "reverse" option, http://us3.php.net/manual/en/function.array-reverse.php
    - update #arrayreset, add option to reset a selection of arrays
@@ -53,7 +55,7 @@
     
 The  MIT License
  
- Copyright (c) 2008 Li Ding and Jie Bao
+ Copyright (c) 2008 
 
  Permission is hereby granted, free of charge, to any person
  obtaining a copy of this software and associated documentation
@@ -89,7 +91,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.1.5',
+        'version' => '1.1.6',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
@@ -391,20 +393,21 @@ class ArrayExtension {
         if (!isset($key) ||!isset($key1) )
 	   return '';
 	   
-	$this->mArrayExtension[$key] = array();
+	$temp_array = array();
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
 	){
 	    foreach ($this->mArrayExtension[$key1] as $entry){
-		   array_push ($this->mArrayExtension[$key], $entry);
+		   array_push ($temp_array, $entry);
 	    }
 
 	    if ( strlen($key2)>0 && array_key_exists($key2,$this->mArrayExtension) && is_array($this->mArrayExtension[$key2])){
 		foreach ($this->mArrayExtension[$key2] as $entry){
-		   array_push ($this->mArrayExtension[$key], $entry);
+		   array_push ($temp_array, $entry);
 		}
 	    }
         }
+	$this->mArrayExtension[$key] = $temp_array;
 	return '';
     }    
 
@@ -420,7 +423,7 @@ class ArrayExtension {
         if (!isset($key) || !isset($key1) || !isset($offset))
 	   return '';
 	   
-        $this->mArrayExtension[$key] = array();
+	$temp_array = array();
         if (isset($this->mArrayExtension)    
 	     && array_key_exists($key1,$this->mArrayExtension) && is_array($this->mArrayExtension[$key1]) 
 	     && !empty($offset) && is_numeric($offset)
@@ -431,8 +434,9 @@ class ArrayExtension {
 			$temp = array_slice($this->mArrayExtension[$key1], $offset);		
 		}
 		if (!empty($temp) && is_array($temp))
-		    $this->mArrayExtension[$key] = array_values($temp);
+		    $temp_array = array_values($temp);
         }
+	$this->mArrayExtension[$key] = $temp_array;
 	return '';
     }     
     
