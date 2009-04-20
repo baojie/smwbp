@@ -227,6 +227,34 @@ else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
+# AskManyExtension (http://tw.rpi.edu/wiki/Help:AskMany)
+echo "AskMany"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="AskManyExtension"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
+
+
+# TetherlessMap (http://www.mediawiki.org/wiki/Extension:Tetherless_Map)
+echo "TetherlessMap"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="TetherlessMap"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
 ###################################################
 # Install SMWBP Configuration Settings
 ###################################################
