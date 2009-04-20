@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Markus Krötzsch
+ * @author Markus KrÃ¶tzsch
  *
  * This special page for MediaWiki implements an OWL-export of
  * semantic data, gathered both from the annotations in articles,
@@ -45,7 +45,9 @@ function smwfDoSpecialOWLExport($page = '') {
 		if ( $wgRequest->getVal( 'xmlmime' )=='rdf' ) {
 			header( "Content-type: application/rdf+xml; charset=UTF-8" );
 		} else {
-			header( "Content-type: application/xml; charset=UTF-8" );
+			//li ding, 2009.04.19 added line, to facilitate Tabulabor RDF browser access
+			//header( "Content-type: application/xml; charset=UTF-8" );
+			header( "Content-type: application/rdf+xml; charset=UTF-8" );
 		}
 
 		if ( $wgRequest->getText( 'postform' ) == 1 ) {
@@ -53,10 +55,12 @@ function smwfDoSpecialOWLExport($page = '') {
 		} else $postform = false;
 
 		$rec = $wgRequest->getText( 'recursive' );
-		if ('' == $rec) $rec = $wgRequest->getVal( 'recursive' );
-		if ( ($rec == '1') && ($smwgAllowRecursiveExport || $wgUser->isAllowed('delete')) ) {
-			$recursive = 1; //users may be allowed to switch it on
-		}
+		//li ding, 2009.04.19 added line, to set recursion depth
+		if (isset($rec)) $recursive= $wgRequest->getVal( 'recursive' );  
+		//if ('' == $rec) $rec = $wgRequest->getVal( 'recursive' );
+		//if ( ($rec == '1') && ($smwgAllowRecursiveExport || $wgUser->isAllowed('delete')) ) {
+		//	$recursive = 1; //users may be allowed to switch it on
+		//}
 		$bl = $wgRequest->getText( 'backlinks' );
 		if ('' == $bl) $bl = $wgRequest->getVal( 'backlinks' );
 		if (($bl == '1') && ($wgUser->isAllowed('delete'))) {
@@ -95,12 +99,15 @@ function smwfDoSpecialOWLExport($page = '') {
 	wfLoadExtensionMessages('SemanticMediaWiki');
 
 	// nothing exported yet; show user interface:
-	$html = '<form name="tripleSearch" action="" method="POST">' . "\n" .
+	$html = '<form name="tripleSearch" action="" method="GET">' . "\n" .
 	        wfMsg('smw_exportrdf_docu') . "\n" .
 	        '<input type="hidden" name="postform" value="1"/>' . "\n" .
 	        '<textarea name="pages" cols="40" rows="10"></textarea><br />' . "\n";
 	if ( $wgUser->isAllowed('delete') || $smwgAllowRecursiveExport) {
-		$html .= '<input type="checkbox" name="recursive" value="1" id="rec">&nbsp;<label for="rec">' . wfMsg('smw_exportrdf_recursive') . '</label></input><br />' . "\n";
+		// li ding, 2009.04.19  change to selection
+		$html .= '<select name="recursive" id="rec"><option selected>0<option>1<option>2<option>3</select>&nbsp;<label for="rec">' . wfMsg('smw_exportrdf_recursive') . '</label></input><br />' . "\n";
+		//$html .= '<input type="checkbox" name="recursive" value="1" id="rec">&nbsp;<label for="rec">' . wfMsg('smw_exportrdf_recursive') . '</label></input><br />' . "\n";
+
 	}
 	if ( $wgUser->isAllowed('delete') || $smwgExportBacklinks) {
 		$html .= '<input type="checkbox" name="backlinks" value="1" default="true" id="bl">&nbsp;<label for="bl">' . wfMsg('smw_exportrdf_backlinks') . '</label></input><br />' . "\n";
@@ -268,6 +275,8 @@ class OWLExport {
 		}
 		wfProfileOut("RDF::PrintPages::PrepareQueue");
 
+		//li ding 2009.04.19. to include pages by recursion depth, 0 means no include
+              $cnt_recursion=$recursion; 		//li ding 2009.04.19. add this line
 		while (count($cur_queue) > 0) {
 			// first, print all selected pages
 			foreach ( $cur_queue as $st) {
@@ -278,10 +287,12 @@ class OWLExport {
 			}
 			// prepare array for next iteration
 			$cur_queue = array();
-			if (1 == $recursion) {
+			if (0 < $cnt_recursion) {  //li ding 2009.04.19. add this line
+			//if (1 == $recursion) {
 				$cur_queue = $this->element_queue + $cur_queue; // make sure the array is *dublicated* instead of copying its ref
 				$this->element_queue = array();
 			}
+			$cnt_recursion = $cnt_recursion-1;	//li ding 2009.04.19. add this line
 			$linkCache->clear();
 		}
 
