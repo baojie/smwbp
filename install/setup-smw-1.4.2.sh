@@ -55,23 +55,49 @@ cd extensions
 # Install SMW 1.4.2
 ###################################################
 
-if [ -d "SemanticMediaWiki" ]
+echo "Semantic MediaWiki"
+
+#if [ -d "SemanticMediaWiki" ]
+#then
+#  echo "SemanticMediaWiki 1.4.2 already installed" 
+#else
+#  wget http://downloads.sourceforge.net/semediawiki/semediawiki-1.4.2.tar.gz
+#  tar -zxf semediawiki-1.4.2.tar.gz
+#  rm semediawiki-1.4.2.tar.gz
+#fi
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-1.4.2"
+EXT_NAME="SemanticMediaWiki"
+if [ -d $EXT_NAME ]
 then
-  echo "SemanticMediaWiki 1.4.2 already installed" 
+  echo "updating...";
+  svn update $EXT_NAME
 else
-  wget http://downloads.sourceforge.net/semediawiki/semediawiki-1.4.2.tar.gz
-  tar -zxf semediawiki-1.4.2.tar.gz
-  rm semediawiki-1.4.2.tar.gz
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 
-if [ -d "SemanticResultFormats" ]
+# Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
+
+#if [ -d "SemanticResultFormats" ]
+#then
+#  echo "SemanticResultFormats 1.4.2 already installed" 
+#else
+#  wget http://downloads.sourceforge.net/semediawiki/SemanticResultFormats-1.4.2.tar.gz
+#  tar -zxf SemanticResultFormats-1.4.2.tar.gz
+#  rm SemanticResultFormats-1.4.2.tar.gz
+#fi
+
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-1.4.2"
+EXT_NAME="SemanticResultFormats"
+if [ -d $EXT_NAME ]
 then
-  echo "SemanticResultFormats 1.4.2 already installed" 
+  echo "updating...";
+  svn update $EXT_NAME
 else
-  wget http://downloads.sourceforge.net/semediawiki/SemanticResultFormats.tar.gz
-  tar -zxf SemanticResultFormats.tar.gz
-  rm SemanticResultFormats.tar.gz
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
 
