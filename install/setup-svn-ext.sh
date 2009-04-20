@@ -201,7 +201,7 @@ fi
 echo "http://www.mediawiki.org/wiki/Extension:External_Data"
 
 EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
-EXT_NAME="External_Data"
+EXT_NAME="ExternalData"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";
