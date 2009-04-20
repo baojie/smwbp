@@ -78,7 +78,16 @@ if (file_exists($extension))
    require_once($extension);
 
    
+## --- Widgets --- 
+# Widget extension for MW
+#  http://www.mediawiki.org/wiki/Extension:Widgets
+#   svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Widgets/
 
+$extension='extensions/Widgets/Widgets.php';
+if (file_exists($extension)){
+   require_once($extension);
+   $wgGroupPermissions['sysop']['editwidgets'] = true;
+}
 
 ## #######################################
 ## SMW Extensions
@@ -104,6 +113,23 @@ $extension='extensions/SemanticResultFormats/SRF_Settings.php';
 if (file_exists($extension))
    require_once($extension);
 
+## --- Semantic Drill Down --- 
+# a page for drilling down into the category-based and semantic data of a site, using easily-created filters.
+# http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown
+# svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
+$extension='extensions/SemanticDrilldown/includes/SD_Settings.php';
+if (file_exists($extension))
+   require_once($extension);
+
+## --- External Data --- 
+# a page for drilling down into the category-based and semantic data of a site, using easily-created filters.
+# http://www.mediawiki.org/wiki/Extension:External_Data
+# svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/ExternalData/
+$extension='extensions/ExternalData/ED_Settings.php';
+if (file_exists($extension))
+   require_once($extension);
+   
+   
 ## --- Semantic Toolkit--- 
 # tools for enhancing user experiences with Semantic Wiki
 # svn checkout http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions/SemanticToolkit/
@@ -111,5 +137,6 @@ if (file_exists($extension))
 $extension='extensions/SemanticToolkit/SemanticToolkit.php';
 if (file_exists($extension))
    require_once($extension);
+   
    
 ?>

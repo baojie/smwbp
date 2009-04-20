@@ -35,18 +35,14 @@ $extension='extensions/Ratings/Ratings.php';
 if (file_exists($extension)){
    require_once($extension);
 }   
+
+
+
    
 ## #######################################
 ## SMW Extensions
 ## #######################################
 
-## --- Semantic Drill Down --- 
-# a page for drilling down into the category-based and semantic data of a site, using easily-created filters.
-# http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown
-# svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/SemanticDrilldown/
-$extension='extensions/SemanticDrilldown/includes/SD_Settings.php';
-if (file_exists($extension))
-   require_once($extension);
 
 
 ## --- TetherlessMap--- 
