@@ -160,7 +160,19 @@ then
   echo "updating...";
   svn update $EXT_NAME
 else
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Widgets/
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
+# FCKeditor extension (http://www.mediawiki.org/wiki/Extension:FCKeditor_(Official))   for user friendly UI
+echo "http://www.mediawiki.org/wiki/Extension:FCKeditor_(Official)"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/FCKeditor_nightly"
+EXT_NAME="FCKeditor"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 

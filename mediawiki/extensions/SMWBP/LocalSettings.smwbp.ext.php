@@ -89,6 +89,16 @@ if (file_exists($extension)){
    $wgGroupPermissions['sysop']['editwidgets'] = true;
 }
 
+## --- FCKeditor --- 
+# Widget extension for MW
+#  http://www.mediawiki.org/wiki/Extension:FCKeditor_(Official)
+#   svn checkout http://smwbp.googlecode.com/svn/trunk/release/FCKeditor_nightly/FCKeditor
+
+$extension='extensions/FCKeditor/FCKeditor.php';
+if (file_exists($extension)){
+   require_once($extension);
+}
+
 ## #######################################
 ## SMW Extensions
 ## #######################################
