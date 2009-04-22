@@ -349,7 +349,7 @@ class SMWAskPage extends SpecialPage {
 			$queryobj = SMWQueryProcessor::createQuery($query, $params, false);
 			$res = smwfGetStore()->getQueryResult($queryobj);
 			$printer = new SMWTableResultPrinter('broadtable',false);
-			$result = $printer->getResultHTML($res, $params);
+			$result = $printer->getResult($res, $params,SMW_OUTPUT_HTML); //$printer->getResultHTML($res, $params);
 
 			// prepare navigation bar
 			if ($offset > 0) 
