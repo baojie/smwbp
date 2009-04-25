@@ -9,7 +9,7 @@
  changelog
  * April 24, 2009 version 1.2
    - fixed a bug in  arrayslice,   (offset=0)
-   - clean up code, added two private functions, validate_array_index, validate_array_by_name; rename some parameters key=> new_key, 
+   - clean up code, added two private functions, validate_array_index, validate_array_offset, validate_array_by_name; rename some parameters key=> new_key,  differentiate offset and index
  * April 18, 2009 version 1.1.6
    - fixed a bug in arraymerge and arrayslice,  
  * Mar 17, 2009 version 1.1.5
@@ -230,17 +230,17 @@ class ArrayExtension {
 
     
 /**
-* locate the index of the first occurence of an element starting from the 'offset'
+* locate the index of the first occurence of an element starting from the 'index'
 *   - print "-1" (not found) or index (found) to show the index of the first occurence of 'value' in the array identified by key
 *    - if 'yes' and 'no' are set, print value of them when found or not-found
-*   - offset is 0-based , it must be non-negative and less than lenth
+*   - index is 0-based , it must be non-negative and less than lenth
 * usage
-*   {{#arraysearch:key|value|offset|yes|no}}
+*   {{#arraysearch:key|value|index|yes|no}}
 *
 *   See: http://www.php.net/manual/en/function.array-search.php
-*   note it is extended to support regular expression match and offset
+*   note it is extended to support regular expression match and index
 */   
-    function arraysearch( &$parser, $key, $needle, $offset=0, $yes=null, $no=null) {
+    function arraysearch( &$parser, $key, $needle, $index=0, $yes=null, $no=null) {
  	$ret = $this->validate_array_by_name($key);
 	if (true!==$ret){
 		$ret = -1;
@@ -257,7 +257,7 @@ class ArrayExtension {
 		return $ret;
 	}
 	   
-	$ret = $this->validate_array_index($offset, $this->mArrayExtension[$key]);
+	$ret = $this->validate_array_index($index, $this->mArrayExtension[$key]);
 	if (true!==$ret){
 		$ret = -1;
 	        if (isset($no))
@@ -268,7 +268,7 @@ class ArrayExtension {
 	//TODO we need a better way to decide perl expresion.
 	$bIsPreg= (0===strpos($needle,'/') );
 	$ret = false;
-	for ($i=$offset; $i< count($this->mArrayExtension[$key]) ;$i++){
+	for ($i=$index; $i< count($this->mArrayExtension[$key]) ;$i++){
 		$value = $this->mArrayExtension[$key][$i];
 		if ($bIsPreg){
 			// check if the needle is preg regular expression (require '/.../')
@@ -439,7 +439,7 @@ class ArrayExtension {
 	   return '';
 	}
 
-	$ret = $this->validate_array_index($offset, $this->mArrayExtension[$key]);
+	$ret = $this->validate_array_offset($offset, $this->mArrayExtension[$key]);
 	if (true!==$ret){
 	   return '';
 	}	
@@ -562,6 +562,24 @@ class ArrayExtension {
 	
 	return true;
     }    
+
+    // private functions for validating the index of an array
+    function validate_array_offset($offset, $array){
+        if (!isset($offset))
+		return false;
+
+	if (!is_numeric($offset))
+		return false;
+
+	if (!isset($array) || !is_array($array))
+		return false;
+		
+	if ( $offset>=count($array))
+		return false;
+	
+	return true;
+    }    
+
     
     //private function for validating array by name
     function validate_array_by_name($array_name){
