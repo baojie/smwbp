@@ -156,10 +156,10 @@ class ArrayExtension {
 	    }
 		
 	    // sort array if the option is set
-	    $this->arraysort($parser, $key, get_array_value($ary_option,"sort"));
+	    $this->arraysort($parser, $key, $this->get_array_value($ary_option,"sort"));
 
 	    // print the array upon request
-	    if (strcmp("list", get_array_value($ary_option,"print"))===0){
+	    if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
 		return $this->arrayprint($parser, $key);
 	    }
 	}
@@ -226,12 +226,12 @@ class ArrayExtension {
 
         $ret = $this->validate_array_by_name($key);
 	if (true!==$ret){
-	    return get_array_value($ary_option,"default");
+	    return $this->get_array_value($ary_option,"default");
 	}
 
 	$ret = $this->validate_array_index($index, $this->mArrayExtension[$key]);
 	if (true!==$ret){
-	    return get_array_value($ary_option,"default");
+	    return $this->get_array_value($ary_option,"default");
 	}
 
 	return $this->mArrayExtension[$key][$index];
