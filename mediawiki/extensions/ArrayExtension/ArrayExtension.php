@@ -1,12 +1,16 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.2
+ verion: 1.2.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 24 April 2009
+ update: 3 May 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
  
  changelog
+ * May 03, 2009 version 1.2.1
+   - update arraydefine by adding options:  "unique";  sort= ( "desc","asce", "random","reverse"), and print= ("list").   options are diliminated by comma, e.g. "unique, sort=desc,print=list". 
+   - fixed bug in arrayslice (offset can be greater than array size): if offset is no less than array size, empty array will be returned, if offset if no greater than negative array size, all elements will be returned
+   - update arrayindex by adding print option when (i) the array is not defined; (ii) the index is not valid in the specified array: e.g. "default=bad array"
  * April 24, 2009 version 1.2
    - fixed a bug in  arrayslice,   (offset=0)
    - clean up code, added two private functions, validate_array_index, validate_array_offset, validate_array_by_name; rename some parameters key=> new_key,  differentiate offset and index
@@ -94,11 +98,12 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding','Jie Bao'),
         'description' => 'store and compute named arrays',
-        'version' => '1.2',
+        'version' => '1.2.1',
 );
  
 $wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
- 
+
+
 /**
    *  named arrays    - an array has a list of values, and could be set to a SET
  */ 
@@ -112,18 +117,19 @@ class ArrayExtension {
 /**
 * Define an array by a list of 'values' deliminated by 'delimiter', 
 * the delimiter should be perl regular expression pattern
-*      {{#arraydefine:key|values|delimiter}}
+*      {{#arraydefine:key|values|delimiter|options}}
 *
 * http://us2.php.net/manual/en/book.pcre.php
 * see also: http://us2.php.net/manual/en/function.preg-split.php
 */
-    function arraydefine( &$parser, $key, $value='', $delimiter = '/\s*,\s*/', $option = 'all', $sort = 'none') {
+    function arraydefine( &$parser, $key, $value='', $delimiter = '/\s*,\s*/', $options = '') {
         if (!isset($key))
 	   return '';
 
         //normalize 
 	$value = trim($value);
 	$delimiter = trim($delimiter);
+	
 	if (empty ($value)){
 	    $this->mArrayExtension[$key] = array();
 	}else if (empty ($delimiter)){
@@ -134,10 +140,28 @@ class ArrayExtension {
 	    }
 	    
 	    $this->mArrayExtension[$key] = preg_split ($delimiter, $value);
-	    switch ($option){	
-		case 'unique': $this->arrayunique($parser, $key); break;
-	    };
-	    $this->arraysort($parser, $key, $sort);
+	    
+	    // validate if the array has been successfully created
+	    $ret = $this->validate_array_by_name($key);
+	    if (true!==$ret){
+	       return '';
+	    }
+	    
+	    // now parse the options, and do posterior process on the created array
+	    $ary_option = $this->parse_options($options);
+	    
+	    // make it unique if option is set
+	    if (FALSE !== array_key_exists('unique', $ary_option)){
+		   $this->arrayunique($parser, $key);
+	    }
+		
+	    // sort array if the option is set
+	    $this->arraysort($parser, $key, get_array_value($ary_option,"sort"));
+
+	    // print the array upon request
+	    if (strcmp("list", get_array_value($ary_option,"print"))===0){
+		return $this->arrayprint($parser, $key);
+	    }
 	}
 	    	
 	return '';
@@ -192,19 +216,22 @@ class ArrayExtension {
     }
 
 /**
-* print the value of an array (identified by key)  by the index, invalid index result in nothing being printed. note the index is 0-based.
+* print the value of an array (identified by key)  by the index, invalid index results in the default value  being printed. note the index is 0-based.
 * usage
 *   {{#arrayindex:key|index}}
 */
-    function arrayindex( &$parser, $key , $index ) {
-	$ret = $this->validate_array_by_name($key);
+    function arrayindex( &$parser, $key , $index , $options='') {
+	// now parse the options, and do posterior process on the created array
+	$ary_option = $this->parse_options($options);
+
+        $ret = $this->validate_array_by_name($key);
 	if (true!==$ret){
-	   return '';
+	    return get_array_value($ary_option,"default");
 	}
 
 	$ret = $this->validate_array_index($index, $this->mArrayExtension[$key]);
 	if (true!==$ret){
-	   return '';
+	    return get_array_value($ary_option,"default");
 	}
 
 	return $this->mArrayExtension[$key][$index];
@@ -439,21 +466,22 @@ class ArrayExtension {
 	   return '';
 	}
 
-	$ret = $this->validate_array_offset($offset, $this->mArrayExtension[$key]);
-	if (true!==$ret){
-	   return '';
-	}	
+	//$ret = $this->validate_array_offset($offset, $this->mArrayExtension[$key]);
+	//if (true!==$ret){
+	 //  return '';
+	//}	
 	   
 	$temp_array = array();
-	if (!empty($length) && is_numeric($length)){
-		$temp = array_slice($this->mArrayExtension[$key], $offset, $length);
-	}else{
-		$temp = array_slice($this->mArrayExtension[$key], $offset);		
-	}
-	
-	if (!empty($temp) && is_array($temp))
-	    $temp_array = array_values($temp);
-	    
+	if (is_numeric($offset)){
+		if (!empty($length) &&  is_numeric($length)){
+			$temp = array_slice($this->mArrayExtension[$key], $offset, $length);
+		}else{
+			$temp = array_slice($this->mArrayExtension[$key], $offset);		
+		}
+		
+		if (!empty($temp) && is_array($temp))
+			$temp_array = array_values($temp);
+	}    
 	$this->mArrayExtension[$new_key] = $temp_array;
 	return '';
     }     
@@ -595,6 +623,34 @@ class ArrayExtension {
 	return true;
     }    
 
+    function get_array_value($array, $field){
+	    if (is_array($array) && FALSE !== array_key_exists($field, $array))
+		return $array[$field];
+	    else
+	        return '';
+    }
+
+    function parse_options($options){
+	if (isset($options)){
+	    // now parse the options, and do posterior process on the created array
+	    $ary_option = preg_split ('/\s*[,]\s*/', strtolower($options));
+	}
+	
+	$ret = array();
+	if (isset($ary_option) && is_array($ary_option) && sizeof($ary_option)>0){
+		foreach ($ary_option as $option){
+			$ary_pair = explode('=', $option,2);
+			if (sizeof($ary_pair)==1){
+				$ret[$ary_pair[0]] = true;
+			}else{
+				$ret[$ary_pair[0]] = $ary_pair[1];
+			}
+		}
+	}
+	
+	return $ret;
+    }
+    
 }
  
 function wfSetupArrayExtension() {
