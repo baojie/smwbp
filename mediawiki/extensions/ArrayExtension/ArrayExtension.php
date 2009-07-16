@@ -22,10 +22,10 @@ todo
  
  changelog
  * July 16, 2009 version 1.2.2
-    - update arrayunique,  fixed bug (zero mistakenly elimiated in array after arrayunique)
+    - update arrayunique,  fixed bug (zero mistakenly eliminated in array after arrayunique)
     - rename key=>arrayid, should not affect any existing users
     - rename validate_array_by_name to validate_array_by_arrayid
-    - add "asc" as option of array_sort
+    - add "asc" as option of arraysort
     
  * May 03, 2009 version 1.2.1
    - update arraydefine by adding options:  "unique";  sort= ( "desc","asce", "random","reverse"), and print= ("list").   options are diliminated by comma, e.g. "unique, sort=desc,print=list". 
@@ -150,9 +150,9 @@ class ArrayExtension {
 	$value = trim($value);
 	$delimiter = trim($delimiter);
 	
-	if (empty ($value)){
+	if (!$this->is_non_empty ($value) ){
 	    $this->mArrayExtension[$arrayid] = array();
-	}else if (empty ($delimiter)){
+	}else if (!$this->is_non_empty($delimiter)){
 	    $this->mArrayExtension[$arrayid] = array( $value );
 	}else{ 
 	    if (0!==strpos($delimiter,'/') || (strlen($delimiter)-1)!==strrpos($delimiter,'/')){
@@ -297,7 +297,7 @@ class ArrayExtension {
 	}
 
 
-        if (!isset($needle) || strlen($needle)===0 ){
+        if (!$this->is_non_empty($needle) ){
 		$ret = -1;
 	        if (isset($no))
 		  $ret=$no;
@@ -356,7 +356,7 @@ class ArrayExtension {
 *    {{#arrayreset:arrayid1,arrayid2,...arrayidn}}
 */
    function arrayreset( &$parser, $arrayids) {
-        if (empty($arrayids)){
+        if (!$this->is_non_empty($arrayids)){
 	    //reset all
 	    $this->mArrayExtension = array();
 	}else{
@@ -469,7 +469,10 @@ class ArrayExtension {
 	$this->mArrayExtension[$arrayid_new] = $temp_array;
 	return '';
     }    
-
+    
+   function is_non_empty($var){
+	return isset($var) && strlen($var)>0;
+   }
 /**
 * extract a slice from an array
 * usage
@@ -494,7 +497,7 @@ class ArrayExtension {
 	   
 	$temp_array = array();
 	if (is_numeric($offset)){
-		if (!empty($length) &&  is_numeric($length)){
+		if ($this->is_non_empty($length) &&  is_numeric($length)){
 			$temp = array_slice($this->mArrayExtension[$arrayid], $offset, $length);
 		}else{
 			$temp = array_slice($this->mArrayExtension[$arrayid], $offset);		
