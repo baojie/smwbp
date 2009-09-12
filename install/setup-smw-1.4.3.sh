@@ -5,7 +5,7 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "./setup-smw-1.4.1.sh WIKI_DIR     - install/update halo extension swm+ at the sub-directory named WIKI_DIR"
+   echo "./setup-smw-1.4.3.sh WIKI_DIR     - install/update smw and swm+ at the sub-directory named WIKI_DIR"
    exit
 else
    # configure your installation path
@@ -15,7 +15,8 @@ fi
 ###################################################
 # Install Mediawiki (MW)
 ###################################################
-./setup-mw.sh "$1" "14"
+./setup-mw.sh "$1" "15"
+
 
 ###################################################
 # Switch to wiki directory
@@ -24,17 +25,18 @@ cd $WIKI_DIR
 
 
 ###################################################
-# Install SMW Plus (1.4)
+# Install SMW Plus 
 ###################################################
-echo "SMW+ 1.4"
+SMWPLUS_VERSION=1.4.4
+echo "SMW+ "$SMWPLUS_VERSION
 
 if [ -d "extensions/SMWHalo" ]
 then
-  echo "smwplus 1.4 already installed" 
+  echo "smwplus already installed" 
 else
-  wget http://downloads.sourceforge.net/halo-extension/smwplus-1.4.zip
-  unzip smwplus-1.4.zip
-  rm smwplus-1.4.zip
+  wget http://downloads.sourceforge.net/halo-extension/smwhalo-$SMWPLUS_VERSION.zip
+  unzip smwhalo-$SMWPLUS_VERSION.zip
+  rm smwhalo-$SMWPLUS_VERSION.zip
 fi
 
 
@@ -44,66 +46,56 @@ fi
 cd extensions
 
 ###################################################
-# Install SMW 1.4.1
+# Install SMW 1.4.3
 ###################################################
+$SMW_VERSION
 
-echo "Semantic MediaWiki"
+echo "Semantic MediaWiki " $SMW_VERSION
 
-#if [ -d "SemanticMediaWiki" ]
-#then
-#  echo "SemanticMediaWiki 1.4.1 already installed" 
-#else
-#  wget http://downloads.sourceforge.net/semediawiki/semediawiki-1.4.1.tar.gz
-#  tar -zxf semediawiki-1.4.1.tar.gz
-#  rm semediawiki-1.4.1.tar.gz
-#fi
-
-EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-1.4.1"
-EXT_NAME="SemanticMediaWiki"
-if [ -d $EXT_NAME ]
+if [ -d "SemanticMediaWiki" ]
 then
-  echo "updating...";
-  svn update $EXT_NAME
+  echo "SemanticMediaWiki $SMW_VERSION already installed" 
 else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
+  wget http://downloads.sourceforge.net/semediawiki/semediawiki-$SMW_VERSION.tar.gz
+  tar -zxf semediawiki-$SMW_VERSION.tar.gz
+  rm semediawiki-$SMW_VERSION.tar.gz
 fi
 
-
-
-
-# Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
-echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
-
-#if [ -d "SemanticResultFormats" ]
+#EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-$SMW_VERSION"
+#EXT_NAME="SemanticMediaWiki"
+#if [ -d $EXT_NAME ]
 #then
-#  echo "SemanticResultFormats 1.4.1 already installed" 
+#  echo "updating...";
+#  svn update $EXT_NAME
 #else
-#  wget http://downloads.sourceforge.net/semediawiki/SemanticResultFormats.tar.gz
-#  tar -zxf SemanticResultFormats.tar.gz
-#  rm SemanticResultFormats.tar.gz
+#  svn checkout $EXT_WEBPATH/$EXT_NAME/
 #fi
 
 
-EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-1.4.1"
-EXT_NAME="SemanticResultFormats"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-
-MW_VERSION=REL1_14
+MW_VERSION=REL1_15
 MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
 MW_WEBPATH_MW=$MW_WEBPATH/phase3
 MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 
-
 ###################################################
 # Install SMW Extensions
 ###################################################
+
+# Semantic Result Format (http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
+
+EXT_WEBPATH=$MW_WEBPATH_EXT
+EXT_NAME="Extension:Semantic_Result_Formats"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
+
+
 # Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
 

@@ -13,16 +13,9 @@ else
 fi
 
 ###################################################
-# Install Mediawiki (MW, 1.14)
+# Install Mediawiki 
 ###################################################
-echo "Mediawiki 1.14"
-if [ -d $WIKI_DIR ]
-then
-  echo "updating...";
-  svn update $WIKI_DIR
-else
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_14/phase3  $WIKI_DIR
-fi
+./setup-mw.sh "$1" "15"
 
 
 
@@ -47,11 +40,20 @@ else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-# Semantic Result Format (only compatible with SMW 1.4, http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
+MW_VERSION=REL1_15
+MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
+MW_WEBPATH_MW=$MW_WEBPATH/phase3
+MW_WEBPATH_EXT=$MW_WEBPATH/extensions
+
+###################################################
+# Install SMW Extensions
+###################################################
+
+# Semantic Result Format (http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats)
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
 
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
-EXT_NAME="SemanticResultFormats"
+EXT_WEBPATH=$MW_WEBPATH_EXT
+EXT_NAME="Extension:Semantic_Result_Formats"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";
@@ -61,3 +63,30 @@ else
 fi
 
 
+
+# Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
+
+EXT_WEBPATH=$MW_WEBPATH_EXT
+EXT_NAME="SemanticForms"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
+
+
+# Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
+
+EXT_WEBPATH=$MW_WEBPATH_EXT
+EXT_NAME="SemanticDrilldown"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi

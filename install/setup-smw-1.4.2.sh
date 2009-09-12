@@ -5,25 +5,18 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "./setup-k.sh WIKI_DIR     - install/update halo extension swm+ at the sub-directory named WIKI_DIR"
+   echo "./setup-smw-1.4.2.sh WIKI_DIR     - install/update halo extension swm+ at the sub-directory named WIKI_DIR"
    exit
 else
    # configure your installation path
    WIKI_DIR=$1
 fi
 
+###################################################
+# Install Mediawiki (MW)
+###################################################
+./setup-mw.sh "$1" "14"
 
-###################################################
-# Install Mediawiki (MW, 1.14)
-###################################################
-echo "Mediawiki 1.14"
-if [ -d $WIKI_DIR ]
-then
-  echo "updating...";
-  svn update $WIKI_DIR
-else
-  svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_14/phase3  $WIKI_DIR
-fi
 
 ###################################################
 # Switch to wiki directory
@@ -101,34 +94,10 @@ else
 fi
 
 
-###################################################
-# Install MW Extensions
-###################################################
-# LdapAuth (LdapAuth)
-echo "LdapAuth"
-
-EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
-EXT_NAME="LdapAuth"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
-
-# CategoryTree (http://www.mediawiki.org/wiki/Extension:CategoryTree)
-echo "http://www.mediawiki.org/wiki/Extension:CategoryTree"
-
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
-EXT_NAME="CategoryTree"
-if [ -d $EXT_NAME ]
-then
-  echo "updating...";
-  svn update $EXT_NAME
-else
-  svn checkout $EXT_WEBPATH/$EXT_NAME/
-fi
+MW_VERSION=REL1_14
+MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
+MW_WEBPATH_MW=$MW_WEBPATH/phase3
+MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 
 
 ###################################################
@@ -137,7 +106,7 @@ fi
 # Semantic Forms  http://www.mediawiki.org/wiki/Extension:Semantic_Forms
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Forms"
 
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_WEBPATH=$MW_WEBPATH_EXT
 EXT_NAME="SemanticForms"
 if [ -d $EXT_NAME ]
 then
@@ -151,7 +120,7 @@ fi
 # Semantic Drilldown (http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown)
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Drilldown"
 
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_WEBPATH=$MW_WEBPATH_EXT
 EXT_NAME="SemanticDrilldown"
 if [ -d $EXT_NAME ]
 then
