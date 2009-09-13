@@ -14,20 +14,19 @@ else
    WIKI_DIR=$1
    if [ -z "$2" ]
    then
-      MW_VERSION="REL1_15"
+		MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/trunk
    else
-      MW_VERSION="REL1_"$2
+        MW_VERSION="REL1_"$2
+		MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
    fi
 fi
 
-MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
 MW_WEBPATH_MW=$MW_WEBPATH/phase3
 MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 
-echo MW_WEBPATH_MW;
 ###################################################
-echo " Install Mediawiki 1.xx"
-echo " $MW_VERSION" 
+echo " Install Mediawiki "
+echo MW_WEBPATH;
 ###################################################
 if [ -d $WIKI_DIR ]
 then

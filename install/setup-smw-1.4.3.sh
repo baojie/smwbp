@@ -1,11 +1,18 @@
 #!/bin/bash
 ###################################################
+# configure
+###################################################
+MW_VERSION=15
+SMWPLUS_VERSION=1.4.4
+SMW_VERSION=1.4.3
+
+###################################################
 # usage
 ###################################################
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "./setup-smw-1.4.3.sh WIKI_DIR     - install/update smw and swm+ at the sub-directory named WIKI_DIR"
+   echo "./setup-smw-$SMW_VERSION.sh WIKI_DIR     - install/update smw and swm+ at the sub-directory named WIKI_DIR"
    exit
 else
    # configure your installation path
@@ -15,7 +22,7 @@ fi
 ###################################################
 # Install Mediawiki (MW)
 ###################################################
-./setup-mw.sh "$1" "15"
+./setup-mw.sh $1 $MW_VERSION
 
 
 ###################################################
@@ -27,7 +34,6 @@ cd $WIKI_DIR
 ###################################################
 # Install SMW Plus 
 ###################################################
-SMWPLUS_VERSION=1.4.4
 echo "SMW+ "$SMWPLUS_VERSION
 
 if [ -d "extensions/SMWHalo" ]
@@ -46,9 +52,8 @@ fi
 cd extensions
 
 ###################################################
-# Install SMW 1.4.3
+# Install SMW 
 ###################################################
-$SMW_VERSION
 
 echo "Semantic MediaWiki " $SMW_VERSION
 
@@ -72,7 +77,7 @@ fi
 #fi
 
 
-MW_VERSION=REL1_15
+MW_VERSION=REL1_$MW_VERSION
 MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
 MW_WEBPATH_MW=$MW_WEBPATH/phase3
 MW_WEBPATH_EXT=$MW_WEBPATH/extensions
@@ -85,7 +90,7 @@ MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 echo "http://www.mediawiki.org/wiki/Extension:Semantic_Result_Formats"
 
 EXT_WEBPATH=$MW_WEBPATH_EXT
-EXT_NAME="Extension:Semantic_Result_Formats"
+EXT_NAME="SemanticResultFormats"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";

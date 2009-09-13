@@ -5,17 +5,27 @@
 if [ -z "$1" ]
 then 
    echo "Example Usage"
-   echo "./setup-smw.sh WIKI_DIR - install/update semantic mediawiki at the sub-directory named WIKI_DIR"
+   echo "./setup-smw-svn.sh WIKI_DIR WIKI_VERSION - install/update MW, SWM and SMW+ at the sub-directory named WIKI_DIR using the wiki version"
    exit
 else
    # configure your installation path
    WIKI_DIR=$1
+   
+   if [ -z "$2" ]
+   then
+		MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/trunk
+   else
+        MW_VERSION="REL1_"$2
+		MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
+   fi
+   MW_WEBPATH_MW=$MW_WEBPATH/phase3
+   MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 fi
 
 ###################################################
 # Install Mediawiki 
 ###################################################
-./setup-mw.sh "$1" "15"
+./setup-mw.sh "$1" "$2"
 
 
 
@@ -30,7 +40,7 @@ cd $WIKI_DIR/extensions
 ###################################################
 echo "Semantic MediaWiki"
 
-EXT_WEBPATH="http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions"
+EXT_WEBPATH=$MW_WEBPATH_EXT
 EXT_NAME="SemanticMediaWiki"
 if [ -d $EXT_NAME ]
 then
@@ -40,10 +50,6 @@ else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-MW_VERSION=REL1_15
-MW_WEBPATH=http://svn.wikimedia.org/svnroot/mediawiki/branches/$MW_VERSION
-MW_WEBPATH_MW=$MW_WEBPATH/phase3
-MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 
 ###################################################
 # Install SMW Extensions
