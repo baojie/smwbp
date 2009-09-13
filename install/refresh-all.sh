@@ -26,6 +26,7 @@ then
 fi
 
 
+
 SCRIPT_NAME="extensions/SemanticMediaWiki/maintenance/SMW_setup.php"
 if [ -f $SCRIPT_NAME ]
 then
