@@ -26,7 +26,7 @@ MW_WEBPATH_EXT=$MW_WEBPATH/extensions
 
 ###################################################
 echo " Install Mediawiki "
-echo MW_WEBPATH;
+echo $MW_WEBPATH;
 ###################################################
 if [ -d $WIKI_DIR ]
 then
