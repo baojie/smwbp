@@ -116,11 +116,11 @@ else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
 
-# Widget (http://www.mediawiki.org/wiki/Extension:Widget)
-echo "http://www.mediawiki.org/wiki/Extension:Widget"
+# Widgets (http://www.mediawiki.org/wiki/Extension:Widgets)
+echo "http://www.mediawiki.org/wiki/Extension:Widgets"
 
 EXT_WEBPATH=$MW_WEBPATH_EXT
-EXT_NAME="Widget"
+EXT_NAME="Widgets"
 if [ -d $EXT_NAME ]
 then
   echo "updating...";
