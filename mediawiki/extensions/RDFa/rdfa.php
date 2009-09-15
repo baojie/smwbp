@@ -152,7 +152,7 @@ function genertateRDFa($title,&$text)
 				
 				$special_property = true;				
 			}
-			//process the triple if property is used as any case defined above
+			//process the triple if property id does not belong to above cases
 			else
 			{
 				//get the URL of property
