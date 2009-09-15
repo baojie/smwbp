@@ -129,3 +129,23 @@ then
 else
   svn checkout $EXT_WEBPATH/$EXT_NAME/
 fi
+
+
+
+
+###################################################
+echo "Install MW Extensions (from SMWBP)"
+###################################################
+
+# Semantic History (http://www.mediawiki.org/wiki/Extension:Semantic_History)
+echo "http://www.mediawiki.org/wiki/Extension:Semantic_History"
+
+EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/mediawiki/extensions"
+EXT_NAME="SemanticHistory"
+if [ -d $EXT_NAME ]
+then
+  echo "updating...";
+  svn update $EXT_NAME
+else
+  svn checkout $EXT_WEBPATH/$EXT_NAME/
+fi
