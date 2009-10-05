@@ -83,6 +83,9 @@ function printRDFa(&$out,&$text)
  */
 function genertateRDFa($title,&$text)
 {
+	global $wgServer,$wgScript;
+	$host_address=$wgServer.$wgScript;
+	
 	$rdfa_output="";
 	
 	//Get the semantic data of current page
@@ -94,16 +97,18 @@ function genertateRDFa($title,&$text)
 		return;
 	}
 	
-	
-	$this_page = $title->getFullURL();
-	$text.="<div id='RDFa' about='".$this_page."'";	
-	$count=0;
+	$id=1;
+	$this_page = $title->getFullURL();	
+	$text .= "<div id='RDFa' about='".$this_page."' xmlns:wiki_".$id."='".$host_address."/'\n".
+			                                       "xmlns:wiki_".$id."_property='".$host_address."/Property:'\n".
+												   "xmlns:wiki_".$id."_category='".$host_address."/Category:'\n";	
 	//render the triples (stored in $semdata) in RDFa , which will be added to the HTML output of the page
 	foreach($semdata->getProperties() as $key => $property)
 	{	
 		//get the values of each property
 		$propvalues = $semdata->getPropertyValues($property);
-		$count++;
+		$rdf_schema='';
+		$wiki_type='';
 		// process triples grouped by predicates
 		foreach ($propvalues as $propvalue) 
 		{	
@@ -115,22 +120,32 @@ function genertateRDFa($title,&$text)
 			//process the triple if property is used to define an instance(category)	
 			if($property_id == '_INST')
 			{
-				$propvalue_page   =  SMWDataValueFactory::newTypeIDValue( '_wpg',$propvalue->getWikiValue());
-				$propvalue_output =  $propvalue_page->getTitle()->getFullURL();
-				$text            .=  " typeof='".$propvalue_output."'";
+				$propvalue_output =  str_replace(':Category','',$propvalue->getWikiValue());
+				$text            .=  " typeof='wiki_".$id."_category".$propvalue_output."'";
 			}
 			//process the triple if property is used to define subclass relation
 			else if ($property_id == '_SUBC') 
 			{
-				$property_output  =  'http://www.w3.org/2000/01/rdf-schema#subClassOf';
-				$propvalue_page_string='Category:'.$propvalue->getWikiValue();
+				if($rdf_schema=='')
+				{
+					$rdf_schema="http://www.w3.org/2000/01/rdf-schema#\n";
+					$text .= "xmlns:rdfs='".$rdf_schema."'";
+				}	
+				$property_output="rdfs:subClassOf";
+				$propvalue_output="wiki_".$id."_category:".str_replace(" ","_",$propvalue->getWikiValue());
 				$special_property = true;
 			}
 			//process the triple if property is used to define sub-property relation
 			else if ($property_id == '_SUBP') 
 			{
-				$property_output = 'http://www.w3.org/2000/01/rdf-schema#subPropertyOf';
-				$propvalue_page_string='Property:'.$propvalue->getWikiValue();
+				if($rdf_schema=='')
+				{
+					$rdf_schema="http://www.w3.org/2000/01/rdf-schema#\n";
+					$text .= "xmlns:rdfs='".$rdf_schema."'";
+				}	
+				
+				$property_output="rdfs:subPropertyOf";
+				$propvalue_output="wiki_".$id.":".str_replace(" ","_",$propvalue->getWikiValue());
 				$special_property = true;
 			}
 			//process the triple if property is used to define the current page is redirect from anther page
@@ -142,14 +157,20 @@ function genertateRDFa($title,&$text)
 			//process the triple if property is used to define the type of a property's value
 			else if($property_id == '_TYPE')
 			{
-				$property_string = $property->getWikiValue();	
-				$property_page   = SMWDataValueFactory::newTypeIDValue( '_wpg', "Property:".$property_string);
-				$property_output = $property_page->getTitle()->getFullURL();
 				
-				if(strtolower(substr($propvalue->getWikiValue(),0,5))!="type:")
-					$propvalue_page_string='Type:';
-				$propvalue_page_string.=$propvalue->getWikiValue();
+				if($wiki_type=='')
+				{
+					$wiki_type = "xmlns:wiki_".$id."_type='".$host_address."/Type:'\n";
+					$text     .= $wiki_type;
+				}
+					
+				$property_string = $property->getWikiValue();
+				$property_string = str_replace( ' ', '_',$property_string);				
+				$property_output = "wiki_".$id."_property:".$property_string;
 				
+
+				$propvalue_page_string=$propvalue->getWikiValue();
+				$propvalue_output="wiki_".$id."_type:".str_replace(" ","_",$propvalue_page_string);
 				$special_property = true;				
 			}
 			//process the triple if property id does not belong to above cases
@@ -157,10 +178,9 @@ function genertateRDFa($title,&$text)
 			{
 				//get the URL of property
 				$property_string = $property->getWikiValue();	
-				$property_page   = SMWDataValueFactory::newTypeIDValue( '_wpg', "Property:".$property_string);
-				$property_output = $property_page->getTitle()->getFullURL();
-				
-				
+				$property_string=str_replace( ' ', '_',$property_string);
+				$property_output = "wiki_".$id."_property:".$property_string;
+								
 				//if the value of property is not a page
 				//print the semantic data using "<div>" markup 				 
 				if(strtolower($property->getTypesValue()->getWikiValue()) != "page")
@@ -171,8 +191,7 @@ function genertateRDFa($title,&$text)
 				//otherwise print the data using "<a>" markup
 				else
 				{
-					$propvalue_page   = SMWDataValueFactory::newTypeIDValue( '_wpg',$propvalue->getWikiValue());
-					$propvalue_output = $propvalue_page->getTitle()->getFullURL();
+					$propvalue_output = "wiki_".$id.":".str_replace(" ","_",$propvalue->getWikiValue());
 					$rdfa_output     .= "<a href='".$propvalue_output."' rel='".$property_output."'></a>\n";
 				}
 			}
@@ -180,8 +199,6 @@ function genertateRDFa($title,&$text)
 			//output the relation in RDFa if the property is one of the special case: _subc, _subp, _type, _redi
 			if($special_property)
 			{
-				$propvalue_page   =  SMWDataValueFactory::newTypeIDValue( '_wpg',$propvalue_page_string);
-				$propvalue_output =  $propvalue_page->getTitle()->getFullURL();
 				$rdfa_output     .=  "<a href='".$propvalue_output."' rel='".$property_output."'></a>\n";			
 			}
 		}
@@ -189,6 +206,7 @@ function genertateRDFa($title,&$text)
 
 	//add rdfa data to the final output
 	$text.=">\n".$rdfa_output."</div>";
+	
 }
 
 ?>
