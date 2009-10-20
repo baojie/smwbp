@@ -48,7 +48,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:RDFa',
         'author' => array ('Jin Guang Zheng','Jie Bao'),
         'description' => 'Output semantic data in the RDFa format',
-        'version' => '0.0.1',
+        'version' => '0.0.2',
 );
 
 /*
@@ -71,9 +71,9 @@ function printRDFa(&$out,&$text)
 {
 	global $wgTitle;
 	global $rdfa_map_page;
-	
+	global $search_monkey_map;
 	//if default page that maps semantic property of MediaWiki to other semantic property is given, use that page
-	if($rdfa_map_page!=null)
+	if($rdfa_map_page!=null&&!isset($search_monkey_map))
 	{
 		$parser=null;
 		wf_RDFa_Mapping_Render($parser,$rdfa_map_page);
@@ -142,7 +142,7 @@ function genertateRDFa($title,&$text)
 				//output translated rdfa
 				$search_monkey_rdfa_namespace=search_monkey_property_mapping("Category".$propvalue_output,$title);
 				if($search_monkey_rdfa_namespace=="")
-					$search_monkey_rdfa_namespace="<div ".search_monkey_property_mapping("prefix",$title).">";
+					$search_monkey_rdfa_namespace="<div style='display:none' ".search_monkey_property_mapping("prefix",$title).">";
 			}
 			//process the triple if property is used to define subclass relation
 			else if ($property_id == '_SUBC') 
@@ -229,7 +229,7 @@ function genertateRDFa($title,&$text)
 
 	
 	if($search_monkey_rdfa_namespace=="")
-		$search_monkey_rdfa_namespace="<div xmlns:wiki_property='".$host_address."/Property:'>";
+		$search_monkey_rdfa_namespace="<div style='display:none' xmlns:wiki_property='".$host_address."/Property:'>";
 		
 	$search_monkey_rdfa_output.="</div>";	
 	//add rdfa data to the final output
@@ -266,36 +266,36 @@ function search_monkey_rdfa($property,$propvalue,$propvalue_type)
 		else if($rdfa_property=="dc:publisher")
 		{
 			$rdfa_output='<div rel="dc:publisher">'.
-						 '	<div typeof="vcard:Organization">
-								<span property="rdfs:label vcard:organization-name" content="'.$propvalue.'"></span>
-							</div>
-						</div>';
+						 '	<div typeof="vcard:Organization">'.
+						 '     <span property="rdfs:label vcard:organization-name">'.$propvalue.'</span>'.
+						 '	</div>'.
+						'</div>';
 		}
 		else if($rdfa_property=="dc:creator")
 		{
-			$rdfa_output='<div rel="dc:creator">
-							<div typeof="vcard:VCard">
-								<span property="rdfs:label vcard:fn" content="'.$propvalue.'"></span>
-							</div>
-						</div>';
+			$rdfa_output='<div rel="dc:creator">'.
+							'<div typeof="vcard:VCard">'.
+								'<span property="rdfs:label vcard:fn">'.$propvalue.'</span>'.
+							'</div>'.
+						'</div>';
 		}
-		else if($rdfa_property=="rdfs:seeAlsomedia:image")
+		else if($rdfa_property=="rdfs:seeAlso media:image")
 		{
-			$rdfa_output='<span rel="rdfs:seeAlso media:image">
-								<img style="display:none" src="'.$propvalue.'"/>
-						  </span>';
+			$rdfa_output='<span rel="rdfs:seeAlso media:image">'.
+								'<img src="'.$propvalue.'"/>'.
+						  '</span>';
 		}
 		else if($rdfa_property=="vcal:location")
 		{
-			$rdfa_output='<div rel="vcal:location">
-							<div typeof="vcard:VCard commerce:Business">
-								<div rel="vcard:adr">
-									<div typeof="vcard:Address">
-										<span property="rdfs:label" content="'.$propvalue.'"></span>
-									</div>
-								</div>
-							</div>
-						  </div>';
+			$rdfa_output='<div rel="vcal:location">'.
+							'<div typeof="vcard:VCard commerce:Business">'.
+								'<div rel="vcard:adr">'.
+									'<div typeof="vcard:Address">'.
+										'<span property="rdfs:label">'.$propvalue.'</span>'.
+									'</div>'.
+								'</div>'.
+							'</div>'.
+						  '</div>';
 		}
 		else if($rdfa_property=="vcard:latitude")
 		{
@@ -305,9 +305,13 @@ function search_monkey_rdfa($property,$propvalue,$propvalue_type)
 		{
 			$rdfa_output='<div rel="vcard:geo"><span property="vcard:longitude" datatype="xsd:float" content="'.$propvalue.'"></span></div>';
 		}
+		else if($rdfa_property=="vcal:url rdfs:seeAlso")
+		{
+			$rdfa_output="<span property='vcal:url rdfs:seeAlso' resource='".$propvalue."'></span>\n";
+		}
 		else
 		{
-		$rdfa_output="<span property='".$rdfa_property."' content='".$propvalue."'></span>\n";
+			$rdfa_output="<span property='".$rdfa_property."'>".$propvalue."</span>\n";
 		}
 	}
 	
