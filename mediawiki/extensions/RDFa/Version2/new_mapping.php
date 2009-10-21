@@ -102,10 +102,17 @@ function parseContent($content)
 		if(preg_match('/@prefix/',$str))
 		{
 			$prefix=explode(" ",$str);
-			if(isset($prefix[1]))
+			$prefix_value="";
+			
+			for($j=1;$j<count($prefix);$j++)
 			{
-				$search_monkey_mapping['prefix'].=$prefix[1]." ";
+				
+				if(isset($prefix[$j]))
+				{
+					$prefix_value.=$prefix[$j]." ";
+				}	
 			}
+			$search_monkey_mapping['prefix'].=$prefix_value;
 		}
 		else
 		{
