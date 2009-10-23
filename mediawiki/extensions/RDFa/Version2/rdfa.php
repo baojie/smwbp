@@ -35,7 +35,7 @@ The  MIT License
 */
 
 require_once("new_mapping.php");
-
+$rdfa_output_bool=true;
 if( !defined( 'MEDIAWIKI' ) ) {
     echo( "This file is an extension to the MediaWiki software and cannot be used standalone.\n" );
     die( 1 );
@@ -71,20 +71,18 @@ function printRDFa(&$out,&$text)
 {
 	global $wgTitle;
 	global $rdfa_map_page;
-	global $search_monkey_map;
+	global $search_monkey_map,$rdfa_output_bool;
 	//if default page that maps semantic property of MediaWiki to other semantic property is given, use that page
-	if($rdfa_map_page!=null&&!isset($search_monkey_map))
+	if($rdfa_map_page!=null&&!$search_monkey_map)
 	{
 		$parser=null;
 		wf_RDFa_Mapping_Render($parser,$rdfa_map_page);
 	}
-	
-	
-	genertateRDFa($wgTitle,$text);
+	if($rdfa_output_bool)
+		generateRDFa($wgTitle,$text);
 	
 	return true;
 }
-
 /*
  * This function gets the semantic data of the current page, and output the data in the RDFa format
  * Input:
@@ -92,7 +90,7 @@ function printRDFa(&$out,&$text)
  *           $text: the HTML text (string) that is being added
  *
  */
-function genertateRDFa($title,&$text)
+function generateRDFa($title,&$text)
 {
 	global $wgServer,$wgScript;
 	$host_address=$wgServer.$wgScript;
@@ -110,9 +108,10 @@ function genertateRDFa($title,&$text)
 	
 	$id=1;
 	$this_page = $title->getFullURL();	
-	$text .= "<div id='RDFa' about='".$this_page."' xmlns:wiki_".$id."='".$host_address."/'\n".
-			                                       "xmlns:wiki_".$id."_property='".$host_address."/Property:'\n".
-												   "xmlns:wiki_".$id."_category='".$host_address."/Category:'\n";
+	$text .= "<div id='RDFa' about='".$this_page."' xmlns:wiki_".$id."='".$host_address."/'".
+			                                       "xmlns:wiki_".$id."_property='".$host_address."/Property:'".
+												   "xmlns:wiki_".$id."_category='".$host_address."/Category:'";
+												   
 	//variable for tranlated rdfa
 	$search_monkey_rdfa_output="";
 	$search_monkey_rdfa_namespace="";
@@ -141,8 +140,6 @@ function genertateRDFa($title,&$text)
 				
 				//output translated rdfa
 				$search_monkey_rdfa_namespace=search_monkey_property_mapping("Category".$propvalue_output,$title);
-				if($search_monkey_rdfa_namespace=="")
-					$search_monkey_rdfa_namespace="<div style='display:none' ".search_monkey_property_mapping("prefix",$title).">";
 			}
 			//process the triple if property is used to define subclass relation
 			else if ($property_id == '_SUBC') 
@@ -229,7 +226,7 @@ function genertateRDFa($title,&$text)
 
 	
 	if($search_monkey_rdfa_namespace=="")
-		$search_monkey_rdfa_namespace="<div style='display:none' xmlns:wiki_property='".$host_address."/Property:'>";
+		$search_monkey_rdfa_namespace="<div style='display:none' ".search_monkey_property_mapping("prefix",$title).">";
 		
 	$search_monkey_rdfa_output.="</div>";	
 	//add rdfa data to the final output

@@ -68,10 +68,10 @@ function wf_RDFa_Mapping_Magic( &$magicWords, $langCode )
  * 	$page_title: title of the page contains the mapping between 2 properties 
  */
 function wf_RDFa_Mapping_Render( &$parser, $page_title)
-{
-	global $search_monkey_map;
-	$search_monkey_map=null;
+{	
+	global $search_monkey_map, $wgTitle, $rdfa_output_bool;
 	
+	$output="";
 	//get the content
 	$title = Title::newFromText($page_title);	
 	if ( isset($title) == false)  // page name illegal
@@ -81,9 +81,12 @@ function wf_RDFa_Mapping_Render( &$parser, $page_title)
 	
 	//parse the content and store the result to the hash table $serach_monkey_map 
 	$search_monkey_map=parseContent($map_content);
-	$output=""; 
 	if($parser!=null)
-	return array( $output, 'noparse' => true, 'isHTML' => true );
+	{
+		generateRDFa($wgTitle,$output);
+		$rdfa_output_bool=false;
+		return array( $output, 'noparse' => true, 'isHTML' => true );
+	}
 }
 /*
  * This function parse the content of the mapping page
@@ -121,7 +124,7 @@ function parseContent($content)
 			$property=explode("=",$str);
 			if(isset($property[0])&&isset($property[1]))
 			{
-				$property[0]=str_replace(" ","",$property[0]);
+				$property[0]=preg_replace('/\s*/','',$property[0]);
 				preg_match('/^\s*(.*?)\s*$/',$property[1],$matches);
 				$search_monkey_mapping[$property[0]]=$matches[1];
 			}
