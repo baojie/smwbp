@@ -21,6 +21,9 @@ todo
        * get_total_col
  
  changelog
+ * July 16, 2009 version 1.2.3
+    - update arrayunique,  fixed bug (empty string should be eliminated in array after arrayunique)
+
  * July 16, 2009 version 1.2.2
     - update arrayunique,  fixed bug (zero mistakenly eliminated in array after arrayunique)
     - rename key=>arrayid, should not affect any existing users
@@ -390,7 +393,8 @@ class ArrayExtension {
 	    $values= array();
 	    foreach ($this->mArrayExtension[$arrayid] as $v){
 		//if (!isset($v))
-		   $values[]=$v;
+			if (sizeof($v)>0)
+		   		$values[]=$v;
 	    }
 	    $this->mArrayExtension[$arrayid] = $values;
     }    
