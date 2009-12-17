@@ -393,7 +393,7 @@ class ArrayExtension {
 	    $values= array();
 	    foreach ($this->mArrayExtension[$arrayid] as $v){
 		//if (!isset($v))
-			if (sizeof($v)>0)
+			if (strlen($v)>0)
 		   		$values[]=$v;
 	    }
 	    $this->mArrayExtension[$arrayid] = $values;
