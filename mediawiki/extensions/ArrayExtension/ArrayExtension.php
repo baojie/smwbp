@@ -1,9 +1,9 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.2.2
+ verion: 1.2.3
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 16 July 2009
+ update: 17 December 2009
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
 todo
