@@ -1,9 +1,9 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.2.3
+ verion: 1.2.4
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 17 December 2009
+ update: 23 January 2010
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
 todo
@@ -21,7 +21,10 @@ todo
        * get_total_col
  
  changelog
- * July 16, 2009 version 1.2.3
+ * January 23, 2010 version 1.2.4
+    - update arraydefine, add more parameter for combining print with arraydefine
+
+ * December 17, 2009 version 1.2.3
     - update arrayunique,  fixed bug (empty string should be eliminated in array after arrayunique)
 
  * July 16, 2009 version 1.2.2
@@ -145,7 +148,7 @@ class ArrayExtension {
 * http://us2.php.net/manual/en/book.pcre.php
 * see also: http://us2.php.net/manual/en/function.preg-split.php
 */
-    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '') {
+    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '', $delimiter2= ', ', $search='@@@@', $subject='@@@@', $frame=null) {
         if (!isset($arrayid))
 	   return '';
 
@@ -183,10 +186,12 @@ class ArrayExtension {
 
 	    // print the array upon request
 	    if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
-		return $this->arrayprint($parser, $arrayid);
+			return $this->arrayprint($parser, $arrayid);
+	    }else if (strcmp("full", $this->get_array_value($ary_option,"print"))===0){
+			return $this->arrayprint($parser, $arrayid,  $delimiter2, $search, $subject, $frame);
 	    }
 	}
-	    	
+	
 	return '';
     }
 
