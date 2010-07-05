@@ -37,6 +37,9 @@ todo:
 	- now using preg_quote in arraydefine when using a non regular expression delimiter
 	- some minor code changes and cleanup
  
+ * January 23, 2010 version 1.2.4
+    - update arraydefine, add more parameter for combining print with arraydefine
+
  * July 16, 2009 version 1.2.3
     - update arrayunique,  fixed bug (empty string should be eliminated in array after arrayunique)
 
@@ -166,7 +169,7 @@ class ArrayExtension {
 	* http://us2.php.net/manual/en/book.pcre.php
 	* see also: http://us2.php.net/manual/en/function.preg-split.php
 	*/
-    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '') {
+    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '', $delimiter2= ', ', $search='@@@@', $subject='@@@@', $frame=null) {
         if (!isset($arrayid))
            return '';
 
@@ -201,13 +204,15 @@ class ArrayExtension {
             // sort array if the option is set
             $this->arraysort($parser, $arrayid, $this->get_array_value($ary_option,"sort"));
 
-            // print the array upon request
-            if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
-                return $this->arrayprint($parser, $arrayid);
-            }
-        }
-                
-        return '';
+			// print the array upon request
+			if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
+				return $this->arrayprint($parser, $arrayid);
+			}else if (strcmp("full", $this->get_array_value($ary_option,"print"))===0){
+				return $this->arrayprint($parser, $arrayid,  $delimiter2, $search, $subject, $frame);
+			}
+	}
+	
+	return '';
     }
 
 
