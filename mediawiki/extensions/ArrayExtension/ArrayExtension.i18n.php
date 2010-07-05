@@ -13,23 +13,24 @@ function efArrayExtensionWords( $lang ) {
          * English
          */
         $words['en'] = array(
-                'arraydefine'    => array( 0, 'arraydefine' ),
+                'arraydefine'       => array( 0, 'arraydefine' ),
 
-                'arrayprint'          => array( 0, 'arrayprint' ),
-                'arraysize'         => array( 0,'arraysize' ),
-                'arrayindex'         => array( 0,'arrayindex' ),
-                'arraysearch'         => array( 0,'arraysearch' ),	
+                'arrayprint'        => array( 0, 'arrayprint' ),
+                'arraysize'         => array( 0, 'arraysize' ),
+                'arrayindex'        => array( 0, 'arrayindex' ),
+                'arraysearch'       => array( 0, 'arraysearch' ),
 		
-                'arrayunique'         => array( 0,'arrayunique' ),
-                'arraysort'         => array( 0,'arraysort' ),
-                'arrayreset'         => array( 0,'arrayreset' ),
+                'arrayunique'       => array( 0, 'arrayunique' ),
+                'arraysort'         => array( 0, 'arraysort' ),
+                'arrayreset'        => array( 0, 'arrayreset' ),
 
-                'arraymerge'         => array( 0,'arraymerge' ),
-                'arrayslice'         => array( 0,'arrayslice' ),
+                'arraymerge'        => array( 0, 'arraymerge' ),
+                'arrayslice'        => array( 0, 'arrayslice' ),
 
-                'arrayunion'         => array( 0,'arrayunion' ),
-                'arrayintersect'         => array( 0,'arrayintersect' ),
-                'arraydiff'         => array( 0,'arraydiff' ),	
+                'arrayunion'        => array( 0, 'arrayunion' ),
+                'arrayintersect'    => array( 0, 'arrayintersect' ),
+                'arraydiff'         => array( 0, 'arraydiff' ),
+                'arraysearcharray'  => array( 0, 'arraysearcharray' ),
         );
  
         # English is used as a fallback, and the English synonyms are
@@ -38,5 +39,3 @@ function efArrayExtensionWords( $lang ) {
                 ? $words['en']
                 : array_merge( $words['en'], $words[$lang] );
 }
- 
-?>

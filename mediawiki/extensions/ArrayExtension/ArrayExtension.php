@@ -1,12 +1,15 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.2.4
- authors: Li Ding (lidingpku@gmail.com) and Jie Bao
- update: 23 January 2010
+ verion: 1.3
+ authors: Li Ding (lidingpku@gmail.com) and Jie Bao, Daniel Werner (since version 1.3)
+ update: 5th July 2010
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
-ToDo
+
+todo:
+=====
+
     - add experimental table (2 dimension array)  data structure
        * table  = header, row+  (1,1....)
        * sort_table_by_header (header)   
@@ -20,11 +23,21 @@ ToDo
        * get_total_row
        * get_total_col
  
- changelog
- * January 23, 2010 version 1.2.4
-    - update arraydefine, add more parameter for combining print with arraydefine
-
- * December 17, 2009 version 1.2.3
+ 
+ changelog:
+ ==========
+ 
+ * July 5, 2010 version 1.3
+	- update arrayunion and arraydiff, fixed heavy bug (gaps between array indexes doing some serious trouble in other arrayfunctions like arraysearch)
+ 	- array function #arraysearcharray added
+	- #arraysearch code cleanup, search parameter is optional now, searching for empty elements is possible now
+	- advanced check for regular expressions in #arraysearch, #arraydefine and #arraysearcharray
+	  Pivate function isValidRegEx() added
+	- #arraymerge bug fixed: Php message in case of non existant seccond array
+	- now using preg_quote in arraydefine when using a non regular expression delimiter
+	- some minor code changes and cleanup
+ 
+ * July 16, 2009 version 1.2.3
     - update arrayunique,  fixed bug (empty string should be eliminated in array after arrayunique)
 
  * July 16, 2009 version 1.2.2
@@ -34,7 +47,7 @@ ToDo
     - add "asc" as option of arraysort
     
  * May 03, 2009 version 1.2.1
-   - update arraydefine by adding options:  "unique";  sort= ( "desc","asce", "random","reverse"), and print= ("list").   options are diliminated by comma, e.g. "unique, sort=desc,print=list". 
+   - update arraydefine by adding options:  "unique";  sort=( "desc", "asce", "random", "reverse"), and print=( "list" ). Options are diliminated by comma, e.g. "unique, sort=desc,print=list". 
    - fixed bug in arrayslice (offset can be greater than array size): if offset is no less than array size, empty array will be returned, if offset if no greater than negative array size, a new array with all elements will be returned
    - update arrayindex by adding print option when (i) the array is not defined; (ii) the index is not valid in the specified array: e.g. "default=bad array"
  * April 24, 2009 version 1.2
@@ -78,17 +91,19 @@ ToDo
     - changed arraydefine (allow defining empty array)
  
 
+
  -------------------------------------------
  the following fuctions are obsoleted
-    #arraypush  (replaced by arraymerge)
-    #arraypop  (replaced by arrayslice)
+    #arraypush   (replaced by arraymerge)
+    #arraypop    (replaced by arrayslice)
     #arraymember (replaced by arraysearch)
  -------------------------------------------
     
     
 The  MIT License
  
- Copyright (c) 2008 
+ Copyright (c) 2008
+
 
  Permission is hereby granted, free of charge, to any person
  obtaining a copy of this software and associated documentation
@@ -99,8 +114,10 @@ The  MIT License
  Software is furnished to do so, subject to the following
  conditions:
 
+
  The above copyright notice and this permission notice shall be
  included in all copies or substantial portions of the Software.
+
 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -116,603 +133,666 @@ The  MIT License
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
- 
+
 $wgExtensionFunctions[] = 'wfSetupArrayExtension';
  
 $wgExtensionCredits['parserhook'][] = array(
         'name' => 'ArrayExtension',
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
-        'author' => array ('Li Ding','Jie Bao'),
-        'description' => 'store and compute named arrays',
-        'version' => '1.2.2',
+        'author' => array ('Li Ding', 'Jie Bao', 'Daniel Werner'),
+        'description' => 'Store and compute named arrays',
+        'version' => '1.3',
 );
  
-$wgHooks['LanguageGetMagic'][]       = 'wfArrayExtensionLanguageGetMagic';
+$wgHooks['LanguageGetMagic'][] = 'wfArrayExtensionLanguageGetMagic';
 
 
 /**
-   *  named arrays    - an array has a list of values, and could be set to a SET
+ *  named arrays - an array has a list of values, and could be set to a SET
  */ 
 class ArrayExtension {
-    var $mArrayExtension; 
+    var $mArrayExtension;
 
-///////////////////////////////////////////////////////////
-// PART 1. constructor
-///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+	// PART 1. constructor
+	///////////////////////////////////////////////////////////
  
-/**
-* Define an array by a list of 'values' deliminated by 'delimiter', 
-* the delimiter should be perl regular expression pattern
-*      {{#arraydefine:arrayid|values|delimiter|options}}
-*
-* http://us2.php.net/manual/en/book.pcre.php
-* see also: http://us2.php.net/manual/en/function.preg-split.php
-*/
-    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '', $delimiter2= ', ', $search='@@@@', $subject='@@@@', $frame=null) {
+	/**
+	* Define an array by a list of 'values' deliminated by 'delimiter', 
+	* the delimiter should be perl regular expression pattern
+	* usage:
+	*      {{#arraydefine:arrayid|values|delimiter|options}}
+	*
+	* http://us2.php.net/manual/en/book.pcre.php
+	* see also: http://us2.php.net/manual/en/function.preg-split.php
+	*/
+    function arraydefine( &$parser, $arrayid, $value='', $delimiter = '/\s*,\s*/', $options = '') {
         if (!isset($arrayid))
-	   return '';
+           return '';
 
         //normalize 
-	$value = trim($value);
-	$delimiter = trim($delimiter);
-	
-	if (!$this->is_non_empty ($value) ){
-	    $this->mArrayExtension[$arrayid] = array();
-	}else if (!$this->is_non_empty($delimiter)){
-	    $this->mArrayExtension[$arrayid] = array( $value );
-	}else{ 
-	    if (0!==strpos($delimiter,'/') || (strlen($delimiter)-1)!==strrpos($delimiter,'/')){
-		$delimiter='/\s*'.$delimiter.'\s*/';
-	    }
-	    
-	    $this->mArrayExtension[$arrayid] = preg_split ($delimiter, $value);
-	    
-	    // validate if the array has been successfully created
-	    $ret = $this->validate_array_by_arrayid($arrayid);
-	    if (true!==$ret){
-	       return '';
-	    }
-	    
-	    // now parse the options, and do posterior process on the created array
-	    $ary_option = $this->parse_options($options);
-	    
-	    // make it unique if option is set
-	    if (FALSE !== array_key_exists('unique', $ary_option)){
-		   $this->arrayunique($parser, $arrayid);
-	    }
-		
-	    // sort array if the option is set
-	    $this->arraysort($parser, $arrayid, $this->get_array_value($ary_option,"sort"));
+        $value = trim($value);
+        $delimiter = trim($delimiter);
+        
+        if (!$this->is_non_empty ($value) ){
+            $this->mArrayExtension[$arrayid] = array();
+        }else if (!$this->is_non_empty($delimiter)){
+            $this->mArrayExtension[$arrayid] = array( $value );
+        }else{ 
+            if ( !$this->isValidRegEx( $delimiter ) )
+                $delimiter = '/\s*' . preg_quote( $delimiter, '/' ) . '\s*/'; //Anpassung von Daniel Werner (preg_quote)		
+            
+            $this->mArrayExtension[$arrayid] = preg_split($delimiter, $value);
+            
+            // validate if the array has been successfully created
+            $ret = $this->validate_array_by_arrayid($arrayid);
+            if ($ret !== true){
+               return '';
+            }
+            
+            // now parse the options, and do posterior process on the created array
+            $ary_option = $this->parse_options($options);
+            
+            // make it unique if option is set
+            if (FALSE !== array_key_exists('unique', $ary_option)){
+                   $this->arrayunique($parser, $arrayid);
+            }
+                
+            // sort array if the option is set
+            $this->arraysort($parser, $arrayid, $this->get_array_value($ary_option,"sort"));
 
-	    // print the array upon request
-	    if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
-			return $this->arrayprint($parser, $arrayid);
-	    }else if (strcmp("full", $this->get_array_value($ary_option,"print"))===0){
-			return $this->arrayprint($parser, $arrayid,  $delimiter2, $search, $subject, $frame);
-	    }
-	}
-	
-	return '';
+            // print the array upon request
+            if (strcmp("list", $this->get_array_value($ary_option,"print"))===0){
+                return $this->arrayprint($parser, $arrayid);
+            }
+        }
+                
+        return '';
     }
 
-///////////////////////////////////////////////////////////
-// PART 2. print
-///////////////////////////////////////////////////////////
 
-/**
-* print an array.
-* foreach element of the array, print 'subject' where  all occurrences of 'search' is replaced with the element, 
-* and each element print-out is deliminated by 'delimiter'
-* The subject can embed parser functions; wiki links; and templates.
-* usage
-*      {{#arrayprint:arrayid|delimiter|search|subject}}
-* examples:
-*    {{#arrayprint:b}}    -- simple
-*    {{#arrayprint:b|<br/>}}    -- add change line
-*    {{#arrayprint:b|<br/>|@@@|[[@@@]]}}    -- embed wiki links
-*    {{#arrayprint:b|<br/>|@@@|{{#set:prop=@@@}} }}   -- embed parser function
-*    {{#arrayprint:b|<br/>|@@@|{{f.tag{{f.print.vbar}}prop{{f.print.vbar}}@@@}} }}   -- embed template function
-*    {{#arrayprint:b|<br/>|@@@|[[name::@@@]]}}   -- make SMW links
-*/ 
+	///////////////////////////////////////////////////////////
+	// PART 2. print
+	///////////////////////////////////////////////////////////
+
+
+	/**
+	* print an array.
+	* foreach element of the array, print 'subject' where  all occurrences of 'search' is replaced with the element, 
+	* and each element print-out is deliminated by 'delimiter'
+	* The subject can embed parser functions; wiki links; and templates.
+	* usage:
+	*      {{#arrayprint:arrayid|delimiter|search|subject}}
+	* examples:
+	*    {{#arrayprint:b}}    -- simple
+	*    {{#arrayprint:b|<br/>}}    -- add change line
+	*    {{#arrayprint:b|<br/>|@@@|[[@@@]]}}    -- embed wiki links
+	*    {{#arrayprint:b|<br/>|@@@|{{#set:prop=@@@}} }}   -- embed parser function
+	*    {{#arrayprint:b|<br/>|@@@|{{f.tag{{f.print.vbar}}prop{{f.print.vbar}}@@@}} }}   -- embed template function
+	*    {{#arrayprint:b|<br/>|@@@|[[name::@@@]]}}   -- make SMW links
+	*/ 
     function arrayprint( &$parser, $arrayid , $delimiter = ', ', $search='@@@@', $subject='@@@@', $frame=null) {
-	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	   return $ret;
-	}
-	   
-	$values=$this->mArrayExtension[$arrayid];    
-	$rendered_values= array();
-	foreach($values as $v){
-		$temp_result_value  = str_replace($search, $v, $subject);
-		if (isset($frame)){
-			$temp_result_value = $parser->preprocessToDom($temp_result_value, $frame->isTemplate() ? Parser::PTD_FOR_INCLUSION : 0);
-			$temp_result_value = trim($frame->expand($temp_result_value));
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true){
+           return $ret;
+        }
+           
+        $values=$this->mArrayExtension[$arrayid];    
+        $rendered_values= array();
+        foreach($values as $v){
+                $temp_result_value  = str_replace($search, $v, $subject);
+                if (isset($frame)){
+                        $temp_result_value = $parser->preprocessToDom($temp_result_value, $frame->isTemplate() ? Parser::PTD_FOR_INCLUSION : 0);
+                        $temp_result_value = trim($frame->expand($temp_result_value));
                 }                  
-		$rendered_values[] = $temp_result_value ;
-	}
-	return array(implode( $delimiter, $rendered_values) , 'noparse' => false, 'isHTML' => false);
+                $rendered_values[] = $temp_result_value ;
+        }
+        return array(implode( $delimiter, $rendered_values) , 'noparse' => false, 'isHTML' => false);
     }
    
     function arrayprintObj(  &$parser, $frame, $args ) {
-		// Set variables
-	$arrayid = isset($args[0]) ? trim($frame->expand($args[0])) : '';
-	$delimiter = isset($args[1]) ? trim($frame->expand($args[1])) : ', ';
-	$search = isset($args[2]) ? trim($frame->expand($args[2], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
-	$subject = isset($args[3]) ? trim($frame->expand($args[3], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
+                // Set variables
+        $arrayid = isset($args[0]) ? trim($frame->expand($args[0])) : '';
+        $delimiter = isset($args[1]) ? trim($frame->expand($args[1])) : ', ';
+        $search = isset($args[2]) ? trim($frame->expand($args[2], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
+        $subject = isset($args[3]) ? trim($frame->expand($args[3], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES)) : '@@@@';
 
-	return $this->arrayprint($parser, $arrayid, $delimiter, $search, $subject, $frame);
+        return $this->arrayprint($parser, $arrayid, $delimiter, $search, $subject, $frame);
     }
 
-/**
-* print the value of an array (identified by arrayid)  by the index, invalid index results in the default value  being printed. note the index is 0-based.
-* usage
-*   {{#arrayindex:arrayid|index}}
-*/
+
+	/**
+	* print the value of an array (identified by arrayid)  by the index, invalid index results in the default value  being printed. note the index is 0-based.
+	* usage:
+	*   {{#arrayindex:arrayid|index}}
+	*/
     function arrayindex( &$parser, $arrayid , $index , $options='') {
-	// now parse the options, and do posterior process on the created array
-	$ary_option = $this->parse_options($options);
+        // now parse the options, and do posterior process on the created array
+        $ary_option = $this->parse_options($options);
 
         $ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	    return $this->get_array_value($ary_option,"default");
-	}
+        if ($ret !== true){
+            return $this->get_array_value($ary_option,"default");
+        }
 
-	$ret = $this->validate_array_index($index, $this->mArrayExtension[$arrayid]);
-	if (true!==$ret){
-	    return $this->get_array_value($ary_option,"default");
-	}
+        $ret = $this->validate_array_index($index, $this->mArrayExtension[$arrayid]);
+        if ($ret !== true){
+            return $this->get_array_value($ary_option,"default");
+        }
 
-	return $this->mArrayExtension[$arrayid][$index];
+        return $this->mArrayExtension[$arrayid][$index];
     }
    
-/**
-* return size of array.
-* Print the size (number of elements) in the specified array
-* usage
-*   {{#arraysize:arrayid}}
-*
-*  See: http://www.php.net/manual/en/function.count.php
-*/
+	/**
+	* return size of array.
+	* Print the size (number of elements) in the specified array
+	* usage:
+	*   {{#arraysize:arrayid}}
+	*
+	*   See: http://www.php.net/manual/en/function.count.php
+	*/
     function arraysize( &$parser, $arrayid) {
- 	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	   return '';
-	}
-	
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true){
+           return '';
+        }
+        
         return count ($this->mArrayExtension[$arrayid]);
-    }    
+    }
+
+
 
 
     
-/**
-* locate the index of the first occurence of an element starting from the 'index'
-*   - print "-1" (not found) or index (found) to show the index of the first occurence of 'value' in the array identified by arrayid
-*    - if 'yes' and 'no' are set, print value of them when found or not-found
-*   - index is 0-based , it must be non-negative and less than lenth
-* usage
-*   {{#arraysearch:arrayid|value|index|yes|no}}
-*
-*   See: http://www.php.net/manual/en/function.array-search.php
-*   note it is extended to support regular expression match and index
-*/   
-    function arraysearch( &$parser, $arrayid, $needle, $index=0, $yes=null, $no=null) {
- 	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-		$ret = -1;
-	        if (isset($no))
-		  $ret=$no;
-		return $ret;
-	}
+	/**
+	* locate the index of the first occurence of an element starting from the 'index'
+	*    - print "-1" (not found) or index (found) to show the index of the first occurence of 'value' in the array identified by arrayid
+	*    - if 'yes' and 'no' are set, print value of them when found or not-found
+	*    - index is 0-based , it must be non-negative and less than lenth
+	* usage:
+	*   {{#arraysearch:arrayid|value|index|yes|no}}
+	*
+	*   See: http://www.php.net/manual/en/function.array-search.php
+	*   note it is extended to support regular expression match and index
+	*/
+    function arraysearch( &$parser, $arrayid, $needle = '/^\s*$/', $index = 0, $yes = null, $no = '-1') {
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true)
+            return $no;
+        
+        $ret = $this->validate_array_index($index, $this->mArrayExtension[$arrayid]);
+        if ( !$ret )
+            return $no;
+		
+        if ( !$this->isValidRegEx( $needle ) )
+			$needle = '/^\s*' . preg_quote( $needle, '/' ) . '\s*$/';
+		
+		//search for a match inside the array:
+        for ($i=$index; $i < count($this->mArrayExtension[$arrayid]); $i++){
+			$value = $this->mArrayExtension[$arrayid][$i];
 
-
-        if (!$this->is_non_empty($needle) ){
-		$ret = -1;
-	        if (isset($no))
-		  $ret=$no;
-		return $ret;
-	}
-	   
-	$ret = $this->validate_array_index($index, $this->mArrayExtension[$arrayid]);
-	if (true!==$ret){
-		$ret = -1;
-	        if (isset($no))
-		  $ret=$no;
-		return $ret;
-	}
-
-	//TODO we need a better way to decide perl expresion.
-	$bIsPreg= (0===strpos($needle,'/') );
-	$ret = false;
-	for ($i=$index; $i< count($this->mArrayExtension[$arrayid]) ;$i++){
-		$value = $this->mArrayExtension[$arrayid][$i];
-		if ($bIsPreg){
-			// check if the needle is preg regular expression (require '/.../')
-			if (preg_match($needle, $value)){
-			   $ret = $i;
-			   break;
-			}   
-		}else{
-			if (strcmp($needle, $value)===0){
-			   $ret = $i;
-			   break;
-			}   
-		}	
-	}
-
-	if (false !== $ret ){
-		if (isset($yes))
-		  $ret=$yes;
-		return $ret;	       
-	}
-	    
-	$ret = -1;
-        if (isset($no))
-	  $ret=$no;
-	return $ret;
-    }        
-   
-
-   
-///////////////////////////////////////////////////////////
-// PART 3. alter an array   
-///////////////////////////////////////////////////////////
-    
-/**
-* reset some or all defined arrayes
-* usage
-*    {{#arrayreset:}}
-*    {{#arrayreset:arrayid1,arrayid2,...arrayidn}}
-*/
-   function arrayreset( &$parser, $arrayids) {
-        if (!$this->is_non_empty($arrayids)){
-	    //reset all
-	    $this->mArrayExtension = array();
-	}else{
-	    $arykeys = explode(',', $arrayids);
-	    foreach ($arykeys as $arrayid){
-		$arrayid = trim($arrayid);
-		if ( array_key_exists($arrayid,$this->mArrayExtension) && is_array($this->mArrayExtension[$arrayid]) ){
-		    unset($this->mArrayExtension[$arrayid]);
+			if (preg_match($needle, $value)){				
+				if (isset($yes))
+					return $yes;
+				else
+					return $i;
+			}
+        }
+         
+		//no match:
+        return $no;
+    }
+	
+	/**
+	* search an array and create a new array with all the results. Transforming the new entries before storing them is possible too.
+	* usage:
+	*   {{#arraysearcharray:arrayid_new|arrayid|needle|index|limit|transform}}
+	*
+	* "needle" can be a regular expression or a string search value. If "needle" is a regular expression, "transform" kan contain
+	* "$n" where "n" stands for a number to access a variable from the regex result.
+	*/
+	function arraysearcharray( &$parser, $arrayid_new, $arrayid, $needle = '/^(\s*)$/', $index = 0, $limit = -1, $transform = '' ) {
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if( !$ret )
+			return '';
+			
+		if( !isset($arrayid_new) )
+			return '';
+		
+		if( !is_numeric($index) )
+			$index = 0;
+			
+		if( !is_numeric($limit) )
+			$limit = -1;
+		
+		//calculate start index for negative start indexes:
+		if( $index < 0 ) {
+			$index = count( $this->mArrayExtension[$arrayid] ) + $index;
+			if( $index < 0 ) $index = 0;
 		}
-	    }
+		
+		$newArr = array();
+		$newArrSize = 0;
+		
+        if ( !$this->isValidRegEx( $needle ) )
+			$needle = '/^\s*(' . preg_quote( $needle, '/' ) . ')\s*$/';
+		
+		//search the array for all matches and put them in the new array
+        for ($i = $index; $i < count($this->mArrayExtension[$arrayid]); $i++)
+		{			
+			$value = $this->mArrayExtension[$arrayid][$i];
+            
+			if( preg_match($needle, $value) ) {
+				if( $transform != '' ) {
+					$value = preg_replace( $needle, $transform, $value );
+				}
+				$newArr[] = $value;
+				$newArrSize++;
+				//stop if limit is reached
+				if( $newArrSize == $limit )
+					break;
+			}
+        }
+		
+		$this->mArrayExtension[$arrayid_new] = $newArr;
+		return '';
 	}
-	return '';
+   
+
+
+   
+	///////////////////////////////////////////////////////////
+	// PART 3. alter an array   
+	///////////////////////////////////////////////////////////
+		
+	/**
+	* reset some or all defined arrayes
+	* usage:
+	*    {{#arrayreset:}}
+	*    {{#arrayreset:arrayid1,arrayid2,...arrayidn}}
+	*/
+	function arrayreset( &$parser, $arrayids) {
+        if (!$this->is_non_empty($arrayids)){
+            //reset all
+            $this->mArrayExtension = array();
+        }else{
+            $arykeys = explode(',', $arrayids);
+            foreach ($arykeys as $arrayid){
+                $arrayid = trim($arrayid);
+                if ( array_key_exists($arrayid,$this->mArrayExtension) && is_array($this->mArrayExtension[$arrayid]) ){
+                    unset($this->mArrayExtension[$arrayid]);
+                }
+            }
+        }
+        return '';
     }    
   
     
-/**
-* convert an array to set
-* convert the array identified by arrayid into a set (all elements are unique)
-* usage
-*   {{#arrayunique:arrayid}}
-*
-*   see: http://www.php.net/manual/en/function.array-unique.php
-*/
+	/**
+	* convert an array to set
+	* convert the array identified by arrayid into a set (all elements are unique)
+	* usage:
+	*   {{#arrayunique:arrayid}}
+	*
+	*   see: http://www.php.net/manual/en/function.array-unique.php
+	*/
     function arrayunique( &$parser, $arrayid ) {
-	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true){
+           return '';
+        }
 
-	    $this->mArrayExtension[$arrayid]= array_unique ($this->mArrayExtension[$arrayid]);
-	    $values= array();
-	    foreach ($this->mArrayExtension[$arrayid] as $v){
-		//if (!isset($v))
-			if (strlen($v)>0)
-		   		$values[]=$v;
-	    }
-	    $this->mArrayExtension[$arrayid] = $values;
+		$this->mArrayExtension[$arrayid]= array_unique ($this->mArrayExtension[$arrayid]);
+		$values= array();
+		foreach ($this->mArrayExtension[$arrayid] as $v){
+			//if (!isset($v))
+					if (strlen($v)>0)
+							$values[]=$v;
+		}
+		$this->mArrayExtension[$arrayid] = $values;
     }    
 
-/**
-* sort an array 
-*   sort specified array in the following order:
-*   * none (default)  - no sort   
-*   *  desc - in descending order, large to small
-*   *  asce - in ascending order, small to large
-*   * random - shuffle the arrry in random order
-*   * reverse - Return an array with elements in reverse order
-* usage
-*   {{#arraysort:arrayid|order}}
-*   
-*   see: http://www.php.net/manual/en/function.sort.php
-*          http://www.php.net/manual/en/function.rsort.php
-*          http://www.php.net/manual/en/function.shuffle.php
-*          http://us3.php.net/manual/en/function.array-reverse.php
-*/ 
+
+	/**
+	* sort specified array in the following order:
+	*    - none:    No sort (default)
+	*    - desc:    In descending order, large to small
+	*    - asce:    In ascending order, small to large
+	*    - random:  Shuffle the arrry in random order
+	*    - reverse: Return an array with elements in reverse order
+	* usage:
+	*   {{#arraysort:arrayid|order}}
+	*   
+	*   see: http://www.php.net/manual/en/function.sort.php
+	*        http://www.php.net/manual/en/function.rsort.php
+	*        http://www.php.net/manual/en/function.shuffle.php
+	*        http://us3.php.net/manual/en/function.array-reverse.php
+	*/ 
     function arraysort( &$parser, $arrayid , $sort = 'none') {
-	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true){
+           return '';
+        }
 
-	switch ($sort){	
-		case 'asc': 
-		case 'asce': 
-		case 'ascending': sort($this->mArrayExtension[$arrayid]); break;
 
-		case 'desc': 
-		case 'descending': rsort($this->mArrayExtension[$arrayid]); break;
-		
-		case 'random': shuffle($this->mArrayExtension[$arrayid]); break;
+        switch ($sort){ 
+                case 'asc': 
+                case 'asce': 
+                case 'ascending': sort($this->mArrayExtension[$arrayid]); break;
 
-		case 'reverse': $this->mArrayExtension[$arrayid]= array_reverse($this->mArrayExtension[$arrayid]); break;		
-	    };
+
+                case 'desc': 
+                case 'descending': rsort($this->mArrayExtension[$arrayid]); break;
+                
+                case 'random': shuffle($this->mArrayExtension[$arrayid]); break;
+
+
+                case 'reverse': $this->mArrayExtension[$arrayid]= array_reverse($this->mArrayExtension[$arrayid]); break;               
+            };
     }    
     
-///////////////////////////////////////////////////////////
-// PART 4. create an array   
-///////////////////////////////////////////////////////////
-/**
-* merge two arrays,  keep duplicated values 
-* usage
-*   {{#arraymerge:arrayid_new|arrayid1|arrayid2}}
-*   
-*  merge values two arrayes identified by arrayid1 and arrayid2 into a new array identified by arrayid_new.
-*  this merge differs from array_merge of php because it merges values.
-*/   
+	
+	///////////////////////////////////////////////////////////
+	// PART 4. create an array   
+	///////////////////////////////////////////////////////////
+	
+	/**
+	* merge two arrays, keep duplicated values 
+	* usage:
+	*   {{#arraymerge:arrayid_new|arrayid1|arrayid2}}
+	*   
+	*  merge values two arrayes identified by arrayid1 and arrayid2 into a new array identified by arrayid_new.
+	*  this merge differs from array_merge of php because it merges values.
+	*/   
     function arraymerge( &$parser, $arrayid_new, $arrayid1, $arrayid2='' ) {
         if (!isset($arrayid_new) )
-	   return '';
+           return '';
 
-	$ret = $this->validate_array_by_arrayid($arrayid1);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid1);
+        if ($ret !== true){
+           return '';
+        }
+           
+        $temp_array = array();
+        foreach ($this->mArrayExtension[$arrayid1] as $entry){
+           array_push ($temp_array, $entry);
+        }
 
-	   
-	$temp_array = array();
-	foreach ($this->mArrayExtension[$arrayid1] as $entry){
-	   array_push ($temp_array, $entry);
-	}
-
-	if ( isset($arrayid2) && strlen($arrayid2)>0){
-		$ret = $this->validate_array_by_arrayid($arrayid1);
-		if (true===$ret){
-			foreach ($this->mArrayExtension[$arrayid2] as $entry){
-			   array_push ($temp_array, $entry);
-			}
-		}
-	}
-	
-	$this->mArrayExtension[$arrayid_new] = $temp_array;
-	return '';
-    }    
-    
-   function is_non_empty($var){
-	return isset($var) && strlen($var)>0;
-   }
-/**
-* extract a slice from an array
-* usage
-*     {{#arrayslice:arrayid_new|arrayid|offset|length}}
-*
-*    extract a slice from an  array
-*    see: http://www.php.net/manual/en/function.array-slice.php
-*/   
+        if ( isset($arrayid2) && strlen($arrayid2)>0){
+                $ret = $this->validate_array_by_arrayid($arrayid2);
+                if ( $ret === true ){
+                        foreach ($this->mArrayExtension[$arrayid2] as $entry){
+                           array_push ($temp_array, $entry);
+                        }
+                }
+        }
+        
+        $this->mArrayExtension[$arrayid_new] = $temp_array;
+        return '';
+    }
+   
+	/**
+	* extract a slice from an array
+	* usage:
+	*     {{#arrayslice:arrayid_new|arrayid|offset|length}}
+	*
+	*    extract a slice from an  array
+	*    see: http://www.php.net/manual/en/function.array-slice.php
+	*/   
     function arrayslice( &$parser, $arrayid_new , $arrayid , $offset, $length='') {
         if (!isset($arrayid_new) )
-	   return '';
+           return '';
 
-	$ret = $this->validate_array_by_arrayid($arrayid);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid);
+        if ($ret !== true){
+           return '';
+        }
 
-	//$ret = $this->validate_array_offset($offset, $this->mArrayExtension[$arrayid]);
-	//if (true!==$ret){
-	 //  return '';
-	//}	
-	   
-	$temp_array = array();
-	if (is_numeric($offset)){
-		if ($this->is_non_empty($length) &&  is_numeric($length)){
-			$temp = array_slice($this->mArrayExtension[$arrayid], $offset, $length);
-		}else{
-			$temp = array_slice($this->mArrayExtension[$arrayid], $offset);		
-		}
+        //$ret = $this->validate_array_offset($offset, $this->mArrayExtension[$arrayid]);
+        //if ($ret !== true){
+         //  return '';
+        //}
+           
+        $temp_array = array();
+        if (is_numeric($offset)){
+                if ($this->is_non_empty($length) &&  is_numeric($length)){
+                        $temp = array_slice($this->mArrayExtension[$arrayid], $offset, $length);
+                }else{
+                        $temp = array_slice($this->mArrayExtension[$arrayid], $offset);         
+                }
+                
+                if (!empty($temp) && is_array($temp))
+                        $temp_array = array_values($temp);
+        }    
+        $this->mArrayExtension[$arrayid_new] = $temp_array;
+        return '';
+    }
+
+	/**
+	* set operation, {red, white} = {red, white} union {red}
+	* usage:
+	*    {{#arrayunion:arrayid_new|arrayid1|arrayid2}}
 		
-		if (!empty($temp) && is_array($temp))
-			$temp_array = array_values($temp);
-	}    
-	$this->mArrayExtension[$arrayid_new] = $temp_array;
-	return '';
-    }     
-    
-//////////////////////////////////////////////////
-// SET OPERATIONS:    a set does not have duplicated element
-    
-/**
-*  set operation,    {red} = {red, white} intersect {red,black}
-* usage
-*    {{#arrayintersect:arrayid_new|arrayid1|arrayid2}}
-*   See: http://www.php.net/manual/en/function.array-intersect.php
-*/ 
-    function arrayintersect( &$parser, $arrayid_new , $arrayid1 , $arrayid2 ) {
-        if (!isset($arrayid_new) )
-	   return '';
-
-	$ret = $this->validate_array_by_arrayid($arrayid1);
-	if (true!==$ret){
-	   return '';
-	}
-	
-	$ret = $this->validate_array_by_arrayid($arrayid2);
-	if (true!==$ret){
-	   return '';
-	}
-	   
- 	$this->mArrayExtension[$arrayid_new] = array_intersect( array_unique($this->mArrayExtension[$arrayid1]), array_unique($this->mArrayExtension[$arrayid2]) );
-	
-	return '';
-    }    
-    
-
-/**
-*    set operation,    {red, white} = {red, white} union {red}
-* usage
-*    {{#arrayunion:arrayid_new|arrayid1|arrayid2}}
-    
-*    similar to arraymerge, this union works on values.
-*/ 
-    
+	*    similar to arraymerge, this union works on values.
+	*/ 
     function arrayunion( &$parser, $arrayid_new , $arrayid1 , $arrayid2 ) {
         if (!isset($arrayid_new) )
-	   return '';
+           return '';
 
-	$ret = $this->validate_array_by_arrayid($arrayid1);
-	if (true!==$ret){
-	   return '';
-	}
 
-	$ret = $this->validate_array_by_arrayid($arrayid2);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid1);
+        if ($ret !== true){
+           return '';
+        }
+
+        $ret = $this->validate_array_by_arrayid($arrayid2);
+        if ($ret !== true){
+           return '';
+        }
+        
+        $this->arraymerge($parser, $arrayid_new, $arrayid1, $arrayid2);
+        $this->mArrayExtension[$arrayid_new] = array_unique ($this->mArrayExtension[$arrayid_new]);
+        
+        return '';
+    }
+
+	//////////////////////////////////////////////////
+	// SET OPERATIONS: a set does not have duplicated element
+		
+	/**
+	* set operation,    {red} = {red, white} intersect {red,black}
+	* usage:
+	*    {{#arrayintersect:arrayid_new|arrayid1|arrayid2}}
+	*   See: http://www.php.net/manual/en/function.array-intersect.php
+	*/ 
+    function arrayintersect( &$parser, $arrayid_new , $arrayid1 , $arrayid2 ) {
+        if (!isset($arrayid_new) )
+           return '';
+
+        $ret = $this->validate_array_by_arrayid($arrayid1);
+        if ($ret !== true){
+           return '';
+        }
+        
+        $ret = $this->validate_array_by_arrayid($arrayid2);
+        if ($ret !== true){
+           return '';
+        }
+        
+		//keys will be preserved...
+        $newArray = array_intersect( array_unique($this->mArrayExtension[$arrayid1]), array_unique($this->mArrayExtension[$arrayid2]) );
+        
+		//...so we have to reorganize the key order
+		$this->mArrayExtension[$arrayid_new] = $this->ReorganizeArrayKeys($newArray);
+		
+        return '';
+    }
 	
-    	$this->arraymerge($parser, $arrayid_new, $arrayid1, $arrayid2);
-	$this->mArrayExtension[$arrayid_new] = array_unique ($this->mArrayExtension[$arrayid_new]);
-	
-	return '';
-    }          
-/**
-*
-* usage
-*    {{#arraydiff:arrayid_new|arrayid1|arrayid2}}
-    
-*    set operation,    {white} = {red, white}  -  {red}
-*    see: http://www.php.net/manual/en/function.array-diff.php
-*/        
-
+	/**
+	*
+	* usage:
+	*    {{#arraydiff:arrayid_new|arrayid1|arrayid2}}
+		
+	*    set operation,    {white} = {red, white}  -  {red}
+	*    see: http://www.php.net/manual/en/function.array-diff.php
+	*/
     function arraydiff( &$parser, $arrayid_new , $arrayid1 , $arrayid2 ) {
         if (!isset($arrayid_new) )
-	   return '';
+           return '';
 
-	$ret = $this->validate_array_by_arrayid($arrayid1);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid1);
+        if ($ret !== true){
+           return '';
+        }
 
-	$ret = $this->validate_array_by_arrayid($arrayid2);
-	if (true!==$ret){
-	   return '';
-	}
+        $ret = $this->validate_array_by_arrayid($arrayid2);
+        if ($ret !== true){
+           return '';
+        }
 
-	$this->mArrayExtension[$arrayid_new] = array_diff( array_unique($this->mArrayExtension[$arrayid1]),array_unique($this->mArrayExtension[$arrayid2]));
+		//keys will be preserved...
+        $newArray = array_diff( array_unique($this->mArrayExtension[$arrayid1]),array_unique($this->mArrayExtension[$arrayid2]));
 
-	return '';
+		//...so we have to reorganize the key order
+		$this->mArrayExtension[$arrayid_new] = $this->ReorganizeArrayKeys($newArray);
+		
+        return '';
     }    
 
 
-//////////////////////////////////////////////////
-// private functions
+
+	//////////////////////////////////////////////////
+	// private functions
+	//////////////////////////////////////////////////
     
+	function is_non_empty($var){
+		return isset($var) && strlen($var)>0;
+	}
+	
     // private functions for validating the index of an array
     function validate_array_index($index, $array){
         if (!isset($index))
-		return false;
+                return false;
 
-	if (!is_numeric($index))
-		return false;
+        if (!is_numeric($index))
+                return false;
 
-	if (!isset($array) || !is_array($array))
-		return false;
-		
-	if ( $index<0 || $index>=count($array))
-		return false;
-	
-	return true;
+        if (!isset($array) || !is_array($array))
+                return false;
+                
+        if (!array_key_exists($index, $array)) /*($index<0 || $index>=count($array))*/
+                return false;
+        
+        return true;
     }    
 
     // private functions for validating the index of an array
     function validate_array_offset($offset, $array){
         if (!isset($offset))
-		return false;
+                return false;
 
-	if (!is_numeric($offset))
-		return false;
 
-	if (!isset($array) || !is_array($array))
-		return false;
-		
-	if ( $offset>=count($array))
-		return false;
-	
-	return true;
-    }    
+        if (!is_numeric($offset))
+                return false;
 
+
+        if (!isset($array) || !is_array($array))
+                return false;
+                
+        if ( $offset>=count($array))
+                return false;
+        
+        return true;
+    }
     
     //private function for validating array by name
     function validate_array_by_arrayid($array_name){
-	if (!isset($array_name))
-	   return '';
-		
-	if (!isset($this->mArrayExtension))
- 	   return "undefined array: $array_name";
-	
+        if (!isset($array_name))
+           return '';
+                
+        if (!isset($this->mArrayExtension))
+           return "undefined array: $array_name";
+        
         if (!array_key_exists($array_name,$this->mArrayExtension) || !is_array($this->mArrayExtension[$array_name]))
- 	   return "undefined array: $array_name";
-		
-	return true;
-    }    
+           return "undefined array: $array_name";
+                
+        return true;
+    }
 
     function get_array_value($array, $field){
-	    if (is_array($array) && FALSE !== array_key_exists($field, $array))
-		return $array[$field];
-	    else
-	        return '';
+            if (is_array($array) && FALSE !== array_key_exists($field, $array))
+                return $array[$field];
+            else
+                return '';
     }
 
     function parse_options($options){
-	if (isset($options)){
-	    // now parse the options, and do posterior process on the created array
-	    $ary_option = preg_split ('/\s*[,]\s*/', strtolower($options));
-	}
-	
-	$ret = array();
-	if (isset($ary_option) && is_array($ary_option) && sizeof($ary_option)>0){
-		foreach ($ary_option as $option){
-			$ary_pair = explode('=', $option,2);
-			if (sizeof($ary_pair)==1){
-				$ret[$ary_pair[0]] = true;
-			}else{
-				$ret[$ary_pair[0]] = $ary_pair[1];
-			}
-		}
-	}
-	
-	return $ret;
+        if (isset($options)){
+            // now parse the options, and do posterior process on the created array
+            $ary_option = preg_split ('/\s*[,]\s*/', strtolower($options));
+        }
+        
+        $ret = array();
+        if (isset($ary_option) && is_array($ary_option) && sizeof($ary_option)>0){
+                foreach ($ary_option as $option){
+                        $ary_pair = explode('=', $option,2);
+                        if (sizeof($ary_pair)==1){
+                                $ret[$ary_pair[0]] = true;
+                        }else{
+                                $ret[$ary_pair[0]] = $ary_pair[1];
+                        }
+                }
+        }        
+        return $ret;
     }
-    
+	
+	//Rebuild the array and reorganize all keys. This means all gaps between array items will be closed.
+	function ReorganizeArrayKeys( $array ) {
+		if (!isset($array) )
+			return array();
+		
+		$newArray = array();
+		
+		foreach ($array as $v){
+			$newArray[] = $v;
+		}
+		
+		return $newArray;
+	}
+	
+	//Decide for the given $pattern if its a valid regular expression or not
+	function isValidRegEx( $pattern ) {		
+		return preg_match( '/^([\\/\\|%]).*\\1[imsSuUx]*$/', $pattern );
+	}
 }
  
 function wfSetupArrayExtension() {
     global $wgParser, $wgMessageCache, $wgArrayExtension, $wgMessageCache, $wgHooks;
  
-    $wgArrayExtension = new ArrayExtension;
- 
+    $wgArrayExtension = new ArrayExtension; 
     $wgParser->setFunctionHook( 'arraydefine', array( &$wgArrayExtension, 'arraydefine' ) );
 
     if( defined( get_class( $wgParser) . '::SFH_OBJECT_ARGS' ) ) {
-	$wgParser->setFunctionHook('arrayprint', array( &$wgArrayExtension, 'arrayprintObj' ), SFH_OBJECT_ARGS);
+        $wgParser->setFunctionHook('arrayprint',  array( &$wgArrayExtension, 'arrayprintObj' ), SFH_OBJECT_ARGS);
     } else {
-	$wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
+        $wgParser->setFunctionHook( 'arrayprint', array( &$wgArrayExtension, 'arrayprint' ) );
     }
 
-    $wgParser->setFunctionHook( 'arraysize', array( &$wgArrayExtension, 'arraysize' ) );
-    $wgParser->setFunctionHook( 'arrayindex', array( &$wgArrayExtension, 'arrayindex' ) );
-    $wgParser->setFunctionHook( 'arraysearch', array( &$wgArrayExtension, 'arraysearch' ) );
+    $wgParser->setFunctionHook( 'arraysize',        array( &$wgArrayExtension, 'arraysize' ) );
+    $wgParser->setFunctionHook( 'arrayindex',       array( &$wgArrayExtension, 'arrayindex' ) );
+    $wgParser->setFunctionHook( 'arraysearch',      array( &$wgArrayExtension, 'arraysearch' ) );
 
-    $wgParser->setFunctionHook( 'arraysort', array( &$wgArrayExtension, 'arraysort' ) );
-    $wgParser->setFunctionHook( 'arrayunique', array( &$wgArrayExtension, 'arrayunique' ) );
-    $wgParser->setFunctionHook( 'arrayreset', array( &$wgArrayExtension, 'arrayreset' ) );
+    $wgParser->setFunctionHook( 'arraysort',        array( &$wgArrayExtension, 'arraysort' ) );
+    $wgParser->setFunctionHook( 'arrayunique',      array( &$wgArrayExtension, 'arrayunique' ) );
+    $wgParser->setFunctionHook( 'arrayreset',       array( &$wgArrayExtension, 'arrayreset' ) );
 
-    $wgParser->setFunctionHook( 'arraymerge', array( &$wgArrayExtension, 'arraymerge' ) );
-    $wgParser->setFunctionHook( 'arrayslice', array( &$wgArrayExtension, 'arrayslice' ) );
+    $wgParser->setFunctionHook( 'arraymerge',       array( &$wgArrayExtension, 'arraymerge' ) );
+    $wgParser->setFunctionHook( 'arrayslice',       array( &$wgArrayExtension, 'arrayslice' ) );
 
-    $wgParser->setFunctionHook( 'arrayunion', array( &$wgArrayExtension, 'arrayunion' ) );
-    $wgParser->setFunctionHook( 'arrayintersect', array( &$wgArrayExtension, 'arrayintersect' ) );
-    $wgParser->setFunctionHook( 'arraydiff', array( &$wgArrayExtension, 'arraydiff' ) );
+    $wgParser->setFunctionHook( 'arrayunion',       array( &$wgArrayExtension, 'arrayunion' ) );
+    $wgParser->setFunctionHook( 'arrayintersect',   array( &$wgArrayExtension, 'arrayintersect' ) );
+    $wgParser->setFunctionHook( 'arraydiff',        array( &$wgArrayExtension, 'arraydiff' ) );
+    $wgParser->setFunctionHook( 'arraysearcharray', array( &$wgArrayExtension, 'arraysearcharray' ) );
 }
  
 function wfArrayExtensionLanguageGetMagic( &$magicWords, $langCode ) {
@@ -721,5 +801,3 @@ function wfArrayExtensionLanguageGetMagic( &$magicWords, $langCode ) {
                 $magicWords[$word] = $trans;
         return true;
 }
- 
-?>
