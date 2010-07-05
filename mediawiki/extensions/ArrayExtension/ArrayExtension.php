@@ -6,7 +6,7 @@
  update: 23 January 2010
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
-todo
+ToDo
     - add experimental table (2 dimension array)  data structure
        * table  = header, row+  (1,1....)
        * sort_table_by_header (header)   
