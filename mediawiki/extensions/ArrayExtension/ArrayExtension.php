@@ -1,7 +1,7 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.3
+ verion: 1.3.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao, Daniel Werner (since version 1.3)
  update: 5th July 2010
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
@@ -26,6 +26,8 @@ todo:
  
  changelog:
  ==========
+ * July 20, 2010 version 1.3.1
+	- Removed critical bug. Some kind of "Superglobal" Arrays on page imports and job queue jobs. Values were passed from one page to another page.
  
  * July 5, 2010 version 1.3
 	- update arrayunion and arraydiff, fixed heavy bug (gaps between array indexes doing some serious trouble in other arrayfunctions like arraysearch)
@@ -144,7 +146,7 @@ $wgExtensionCredits['parserhook'][] = array(
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding', 'Jie Bao', 'Daniel Werner'),
         'description' => 'Store and compute named arrays',
-        'version' => '1.3',
+        'version' => '1.3.1',
 );
  
 $wgHooks['LanguageGetMagic'][] = 'wfArrayExtensionLanguageGetMagic';
@@ -154,8 +156,18 @@ $wgHooks['LanguageGetMagic'][] = 'wfArrayExtensionLanguageGetMagic';
  *  named arrays - an array has a list of values, and could be set to a SET
  */ 
 class ArrayExtension {
-    var $mArrayExtension;
+    var $mArrayExtension = array();
 
+	function ArrayExtension() {
+		global $wgHooks;
+		$wgHooks['ParserClearState'][] = &$this;
+	}
+	
+	function onParserClearState( &$parser ) {
+		$this->mArrayExtension = array();	//remove all arrays to avoid conflicts with job queue or Special:Import or SMW semantic updates
+		return true;
+	}	
+	
 	///////////////////////////////////////////////////////////
 	// PART 1. constructor
 	///////////////////////////////////////////////////////////
