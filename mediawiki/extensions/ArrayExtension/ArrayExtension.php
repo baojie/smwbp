@@ -3,7 +3,7 @@
  Defines a subset of parser functions that operate with arrays.
  verion: 1.3.1
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao, Daniel Werner (since version 1.3)
- update: 5th July 2010
+ update: 20th July 2010
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
 
