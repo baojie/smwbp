@@ -46,9 +46,9 @@ if [ -d "SemanticMediaWiki" ]
 then
   echo "SemanticMediaWiki $SMW_VERSION already installed" 
 else
-  wget http://downloads.sourceforge.net/semediawiki/semediawiki-$SMW_VERSION.tar.gz
-  tar -zxf semediawiki-$SMW_VERSION.tar.gz
-  rm semediawiki-$SMW_VERSION.tar.gz
+  wget http://downloads.sourceforge.net/semediawiki/semediawiki-$SMW_VERSION.tgz
+  tar -zxf semediawiki-$SMW_VERSION.tgz
+  rm semediawiki-$SMW_VERSION.tgz
 fi
 
 #EXT_WEBPATH="http://smwbp.googlecode.com/svn/trunk/release/semediawiki-$SMW_VERSION"
