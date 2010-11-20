@@ -12,6 +12,7 @@
 #  permissions
 # disallow anonymous edit
 $wgGroupPermissions['*']['edit'] = false;  # restrict anonymous edit
+$wgGroupPermissions['*']['createaccount'] = false;  # restrict anonymous account creation
 
 # add user privillege
 $wgGroupPermissions['user']['delete'] = true;  # allow user delete
@@ -36,8 +37,24 @@ $wgCheckFileExtensions = false;
 $wgStrictFileExtensions = false;
 
 /** File extensions. */
-$wgFileExtensions = array( 'png', 'gif', 'jpg', 'jpeg' , 'ppt', 'pdf', 'ps', 'ep
-s', 'doc','xls', 'owl', 'zip', 'gz', 'txt', 'tex', 'bib', 'cls', 'sty' );
+$wgFileExtensions[] = 'cls';
+$wgFileExtensions[] = 'doc';
+$wgFileExtensions[] = 'eps';
+$wgFileExtensions[] = 'gz';
+$wgFileExtensions[] = 'js';
+$wgFileExtensions[] = 'n3';
+$wgFileExtensions[] = 'owl';
+$wgFileExtensions[] = 'ps';
+$wgFileExtensions[] = 'ppt';
+$wgFileExtensions[] = 'rdf';
+$wgFileExtensions[] = 'sparql';
+$wgFileExtensions[] = 'sty';
+$wgFileExtensions[] = 'tex';
+$wgFileExtensions[] = 'ttl';
+$wgFileExtensions[] = 'txt';
+$wgFileExtensions[] = 'xls';
+$wgFileExtensions[] = 'zip';
+
 
 /** verify mime type */
 $wgVerifyMimeType= false;
