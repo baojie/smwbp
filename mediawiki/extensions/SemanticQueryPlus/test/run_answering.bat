@@ -1,0 +1,1 @@
+php QLPlus_QueryProcessorTest.php -q ask.ql
