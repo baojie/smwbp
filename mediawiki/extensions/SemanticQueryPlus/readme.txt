@@ -1,23 +1,3 @@
-{{Extension
-|name      = SemanticQueryPlus
-|type	   = hook
-|status    = beta
-|author    = [[User:baojie|Jie Bao]]
-|image     =
-|description = Extend SMW modeling and query languag, based on a logic programming reasoner.
-|version   = 0.1
-|update    = 22nd Dec. 2010
-|mediawiki = 1.16
-|license   = MIT License
-|download  = 
-[http://tw.rpi.edu/proj/semhis.wiki/download/SemanticHistory.zip Zip File] <br>
-|readme    =
-|changelog =  [[#Change Log]]
-|example = 
-}} 
-[[Category:Semantic MediaWiki extensions]]
-
-__TOC__
 
 ==What This Extension Does==
 
