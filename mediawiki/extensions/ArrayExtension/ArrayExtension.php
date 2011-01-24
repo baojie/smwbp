@@ -1,13 +1,14 @@
 <?php
 /*
  Defines a subset of parser functions that operate with arrays.
- verion: 1.3.1
+ verion: 1.3.2
  authors: Li Ding (lidingpku@gmail.com) and Jie Bao, Daniel Werner (since version 1.3)
- update: 20th July 2010
+ update: 24th January 2011
+
  homepage: http://www.mediawiki.org/wiki/Extension:ArrayExtension
 
 
-todo:
+ToDo:
 =====
 
     - add experimental table (2 dimension array)  data structure
@@ -24,11 +25,14 @@ todo:
        * get_total_col
  
  
- changelog:
+ Changelog:
  ==========
+ * January 24, 2011 version 1.3.2
+    - New public class methods for creating and removing arrays. Good for use by other extensions.
+    - VERSION constant added to ArrayExtension class 
  * July 20, 2010 version 1.3.1
-	- Removed critical bug. Some kind of "Superglobal" Arrays on page imports and job queue jobs. Values were passed from one page to another page.
- 
+	- Removed critical bug. Some kind of "Superglobal" Arrays on page imports and job queue jobs. Values were passed from one page to another page. 
+
  * July 5, 2010 version 1.3
 	- update arrayunion and arraydiff, fixed heavy bug (gaps between array indexes doing some serious trouble in other arrayfunctions like arraysearch)
  	- array function #arraysearcharray added
@@ -49,13 +53,14 @@ todo:
     - update arrayunique,  fixed bug (zero mistakenly eliminated in array after arrayunique)
     - rename key=>arrayid, should not affect any existing users
     - rename validate_array_by_name to validate_array_by_arrayid
-    - add "asc" as option of arraysort
-    
+    - add "asc" as option of arraysort    
+
  * May 03, 2009 version 1.2.1
    - update arraydefine by adding options:  "unique";  sort=( "desc", "asce", "random", "reverse"), and print=( "list" ). Options are diliminated by comma, e.g. "unique, sort=desc,print=list". 
    - fixed bug in arrayslice (offset can be greater than array size): if offset is no less than array size, empty array will be returned, if offset if no greater than negative array size, a new array with all elements will be returned
    - update arrayindex by adding print option when (i) the array is not defined; (ii) the index is not valid in the specified array: e.g. "default=bad array"
  * April 24, 2009 version 1.2
+ 
    - fixed a bug in  arrayslice,   (offset=0)
    - clean up code, added two private functions, validate_array_index, validate_array_offset, validate_array_by_arrayid; rename some parameters key=> new_key,  differentiate offset and index
  * April 18, 2009 version 1.1.6
@@ -94,7 +99,7 @@ todo:
     - added arrayindex (return an array element at index)
  * Jan 27, 2009  version 1.0.1 
     - changed arraydefine (allow defining empty array)
- 
+
 
 
  -------------------------------------------
@@ -103,10 +108,10 @@ todo:
     #arraypop    (replaced by arrayslice)
     #arraymember (replaced by arraysearch)
  -------------------------------------------
-    
-    
+
+
 The  MIT License
- 
+
  Copyright (c) 2008
 
 
@@ -135,27 +140,31 @@ The  MIT License
 
 */
  
-if ( !defined( 'MEDIAWIKI' ) ) {
+if ( ! defined( 'MEDIAWIKI' ) ) {
     die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
-$wgExtensionFunctions[] = 'wfSetupArrayExtension';
+$wgExtensionFunctions[] = 'efSetupArrayExtension';
  
 $wgExtensionCredits['parserhook'][] = array(
         'name' => 'ArrayExtension',
         'url' => 'http://www.mediawiki.org/wiki/Extension:ArrayExtension',
         'author' => array ('Li Ding', 'Jie Bao', 'Daniel Werner'),
         'description' => 'Store and compute named arrays',
-        'version' => '1.3.1',
+        'version' => ArrayExtension::VERSION,
+
 );
  
-$wgHooks['LanguageGetMagic'][] = 'wfArrayExtensionLanguageGetMagic';
+$wgHooks['LanguageGetMagic'][] = 'efArrayExtensionLanguageGetMagic';
 
 
 /**
  *  named arrays - an array has a list of values, and could be set to a SET
  */ 
 class ArrayExtension {
+
+	const VERSION = '1.3.2';
+
     var $mArrayExtension = array();
 
 	function ArrayExtension() {
@@ -166,7 +175,7 @@ class ArrayExtension {
 	function onParserClearState( &$parser ) {
 		$this->mArrayExtension = array();	//remove all arrays to avoid conflicts with job queue or Special:Import or SMW semantic updates
 		return true;
-	}	
+	}
 	
 	///////////////////////////////////////////////////////////
 	// PART 1. constructor
@@ -417,7 +426,6 @@ class ArrayExtension {
    
 
 
-   
 	///////////////////////////////////////////////////////////
 	// PART 3. alter an array   
 	///////////////////////////////////////////////////////////
@@ -435,10 +443,7 @@ class ArrayExtension {
         }else{
             $arykeys = explode(',', $arrayids);
             foreach ($arykeys as $arrayid){
-                $arrayid = trim($arrayid);
-                if ( array_key_exists($arrayid,$this->mArrayExtension) && is_array($this->mArrayExtension[$arrayid]) ){
-                    unset($this->mArrayExtension[$arrayid]);
-                }
+				$this->removeArray( $arrayids );
             }
         }
         return '';
@@ -640,7 +645,7 @@ class ArrayExtension {
         $newArray = array_intersect( array_unique($this->mArrayExtension[$arrayid1]), array_unique($this->mArrayExtension[$arrayid2]) );
         
 		//...so we have to reorganize the key order
-		$this->mArrayExtension[$arrayid_new] = $this->ReorganizeArrayKeys($newArray);
+		$this->mArrayExtension[$arrayid_new] = $this->reorganizeArrayKeys($newArray);
 		
         return '';
     }
@@ -671,7 +676,7 @@ class ArrayExtension {
         $newArray = array_diff( array_unique($this->mArrayExtension[$arrayid1]),array_unique($this->mArrayExtension[$arrayid2]));
 
 		//...so we have to reorganize the key order
-		$this->mArrayExtension[$arrayid_new] = $this->ReorganizeArrayKeys($newArray);
+		$this->mArrayExtension[$arrayid_new] = $this->reorganizeArrayKeys($newArray);
 		
         return '';
     }    
@@ -763,17 +768,66 @@ class ArrayExtension {
         return $ret;
     }
 	
-	//Rebuild the array and reorganize all keys. This means all gaps between array items will be closed.
-	function ReorganizeArrayKeys( $array ) {
-		if (!isset($array) )
-			return array();
-		
-		$newArray = array();
-		
-		foreach ($array as $v){
-			$newArray[] = $v;
+	/* ============================ */	
+	/* ============================ */
+	/* ===                      === */
+	/* ===   HELPER FUNCTIONS   === */
+	/* ===                      === */
+	/* ============================ */	
+	/* ============================ */
+
+    function getArrayValue( $arrayId='', $key='' ) {
+		$arrayId = trim( $arrayId );
+		if( $this->arrayExists( $arrayId ) && array_key_exists( $key, $this->mArrayExtension[ $arrayId ] ) )
+			return $this->mArrayExtension[ $arrayId ][ $key ];
+		else
+			return '';
+    }
+	
+	//return an array identified by $arrayId. If it doesn't exist this will return null.
+    function getArray( $arrayId='' ) {
+		if( $this->arrayExists( $arrayId ) )
+			return $this->mArrayExtension[ $arrayId ];
+		else
+			return null;
+    }
+	
+	function arrayExists( $arrayId='' ) {
+		if( array_key_exists( trim( $arrayId ), $this->mArrayExtension ) )
+
+
+
+			return true;
+		else
+			return false;
+	}
+	
+	//add a new array or overwrite existing one. Values delivered as real array.
+	function createArray( $arrayId='', $arr=array() ) {
+		$arr = $this->reorganizeArrayKeys( $arr );
+		$this->mArrayExtension[ trim( $arrayId ) ] = $arr;
+	}
+
+	
+	//remove an existing array. If array doesn't exist this will return false, otherwise true.
+	function removeArray( $arrayId='' ) {
+		$arrayId = trim( $arrayId );
+		if( $this->arrayExists( $arrayId ) ) {
+			unset( $this->mArrayExtension[ $arrayId ] );
+			return true;
+		} else {
+			return false;
 		}
-		
+
+
+	}
+	
+	//Rebuild the array and reorganize all keys. This means all gaps between array items will be closed.
+	function reorganizeArrayKeys( $arr = array() ) {	
+		$newArray = array();		
+		foreach ($arr as $val){
+			$newArray[] = trim( $val );
+		}		
 		return $newArray;
 	}
 	
@@ -783,9 +837,9 @@ class ArrayExtension {
 	}
 }
  
-function wfSetupArrayExtension() {
-    global $wgParser, $wgMessageCache, $wgArrayExtension, $wgMessageCache, $wgHooks;
- 
+function efSetupArrayExtension() {
+    global $wgParser, $wgArrayExtension;
+
     $wgArrayExtension = new ArrayExtension; 
     $wgParser->setFunctionHook( 'arraydefine', array( &$wgArrayExtension, 'arraydefine' ) );
 
@@ -812,7 +866,7 @@ function wfSetupArrayExtension() {
     $wgParser->setFunctionHook( 'arraysearcharray', array( &$wgArrayExtension, 'arraysearcharray' ) );
 }
  
-function wfArrayExtensionLanguageGetMagic( &$magicWords, $langCode ) {
+function efArrayExtensionLanguageGetMagic( &$magicWords, $langCode ) {
         require_once( dirname( __FILE__ ) . '/ArrayExtension.i18n.php' );
         foreach( efArrayExtensionWords( $langCode ) as $word => $trans )
                 $magicWords[$word] = $trans;
