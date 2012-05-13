@@ -57,7 +57,7 @@ function efJSON_Render($parser, $json = '') {
    }   
    #$json_string = json_encode($data);
    $title = $wgArticle ->getTitle()->getFullText();
-   $triples = efJSON_Parse($data, efJSON_makeID() , $title);
+   $triples = efJSON_Parse($data, efJSON_makeID() , $title, $title);
    
    #$wgOut->addWikiText($triples);
    $output = $parser->recursiveTagParse($triples);
@@ -78,9 +78,9 @@ function efJSON_makeID()
 	return "json$efJSON_Count";
 }
 
-function efJSON_Parse($obj, $id, $title){			
+function efJSON_Parse($obj, $id, $title, $parent_node){			
 	# create a new json object, increase the gobal counter of json ids
-    $output = "{{#subobject:$id|Subobject of=$title";
+    $output = "{{#subobject:$id|Has JSON container=$title|Has JSON parent=$parent_node";
 	#$output = "{{#set_internal:$id|Subobject of=$title";
 	
 	# other subobjects
@@ -99,7 +99,7 @@ function efJSON_Parse($obj, $id, $title){
 		else{
 			$new_id = efJSON_makeID();
 			$output .= "|$property=$title#$new_id";
-			$more_objects .= efJSON_Parse($value, $new_id, $title);
+			$more_objects .= efJSON_Parse($value, $new_id, $title, "$title#$id");
 		}		
 	}
 	$output .= "}}";#."\n";
